@@ -10,6 +10,7 @@ datasource db {
 enum QuestionType {
   quiz
   theory
+  short_answer
 }
 
 enum Difficulty {

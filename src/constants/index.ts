@@ -42,4 +42,6 @@ export const ROUTES = {
   subjects: "/admin/subjects",
   topics: "/admin/topics",
   quizResults: "/quiz/results",
+  shortAnswer: "/short-answer",
+  shortAnswerQuestions: "/admin/short-answer-questions",
 } as const;

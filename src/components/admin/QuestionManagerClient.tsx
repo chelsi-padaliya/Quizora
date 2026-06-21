@@ -39,6 +39,11 @@ const TheoryForm = dynamic(
   { loading: () => <QuestionTableSkeleton count={1} /> }
 );
 
+const ShortAnswerForm = dynamic(
+  () => import("@/components/forms/ShortAnswerForm").then((m) => m.ShortAnswerForm),
+  { loading: () => <QuestionTableSkeleton count={1} /> }
+);
+
 interface QuestionManagerClientProps {
   questions: QuestionRow[];
   subjects: { id: string; name: string }[];
@@ -46,7 +51,7 @@ interface QuestionManagerClientProps {
   page: number;
   totalPages: number;
   total: number;
-  fixedType?: "quiz" | "theory";
+  fixedType?: "quiz" | "theory" | "short_answer";
   title?: string;
   showBulkImport?: boolean;
   showDuplicate?: boolean;
@@ -107,7 +112,7 @@ export function QuestionManagerClient({
   }, [debouncedSearch, searchParams, updateParams]);
 
   const FormComponent =
-    fixedType === "quiz" ? QuizForm : fixedType === "theory" ? TheoryForm : QuestionForm;
+    fixedType === "quiz" ? QuizForm : fixedType === "theory" ? TheoryForm : fixedType === "short_answer" ? ShortAnswerForm : QuestionForm;
 
   const handleDelete = useCallback(
     async (id: string) => {

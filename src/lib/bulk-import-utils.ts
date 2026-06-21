@@ -1,6 +1,6 @@
 import * as XLSX from "xlsx";
 
-export type BulkImportQuestionType = "quiz" | "theory";
+export type BulkImportQuestionType = "quiz" | "theory" | "short_answer";
 
 export const QUIZ_IMPORT_COLUMNS = [
   "subject",
@@ -23,8 +23,18 @@ export const THEORY_IMPORT_COLUMNS = [
   "answer",
 ] as const;
 
+export const SHORT_ANSWER_IMPORT_COLUMNS = [
+  "subject",
+  "topic",
+  "difficulty",
+  "question",
+  "answer",
+  "explanation",
+] as const;
+
 export type QuizImportColumn = (typeof QUIZ_IMPORT_COLUMNS)[number];
 export type TheoryImportColumn = (typeof THEORY_IMPORT_COLUMNS)[number];
+export type ShortAnswerImportColumn = (typeof SHORT_ANSWER_IMPORT_COLUMNS)[number];
 
 export interface BulkImportRawRow {
   subject: string;
@@ -76,12 +86,25 @@ const THEORY_SAMPLE_ROW: BulkImportRawRow = {
   answer: "Adding more servers to handle traffic.",
 };
 
+const SHORT_ANSWER_SAMPLE_ROW: BulkImportRawRow = {
+  subject: "API",
+  topic: "HTTP Methods",
+  difficulty: "Beginner",
+  question: "What is GET used for?",
+  answer: "Read Data",
+  explanation: "GET is used to retrieve/read data.",
+};
+
 function getColumns(type: BulkImportQuestionType) {
-  return type === "quiz" ? QUIZ_IMPORT_COLUMNS : THEORY_IMPORT_COLUMNS;
+  if (type === "quiz") return QUIZ_IMPORT_COLUMNS;
+  if (type === "short_answer") return SHORT_ANSWER_IMPORT_COLUMNS;
+  return THEORY_IMPORT_COLUMNS;
 }
 
 function getSampleRow(type: BulkImportQuestionType): BulkImportRawRow {
-  return type === "quiz" ? QUIZ_SAMPLE_ROW : THEORY_SAMPLE_ROW;
+  if (type === "quiz") return QUIZ_SAMPLE_ROW;
+  if (type === "short_answer") return SHORT_ANSWER_SAMPLE_ROW;
+  return THEORY_SAMPLE_ROW;
 }
 
 function normalizeKey(key: string): string {
@@ -205,12 +228,18 @@ export function getFormatDescription(type: BulkImportQuestionType): string {
   if (type === "quiz") {
     return "Columns: subject, topic, difficulty, question, optionA, optionB, optionC, optionD, correctAnswer, explanation";
   }
+  if (type === "short_answer") {
+    return "Columns: subject, topic, difficulty, question, answer, explanation";
+  }
   return "Columns: subject, topic, difficulty, question, answer";
 }
 
 export function getFormatExample(type: BulkImportQuestionType): string {
   if (type === "quiz") {
     return "subject,topic,difficulty,question,optionA,optionB,optionC,optionD,correctAnswer,explanation\nJavaScript,Array,Beginner,What is map()?,Transforms array,Filters array,Deletes array,Sorts array,A,map transforms every item";
+  }
+  if (type === "short_answer") {
+    return "subject,topic,difficulty,question,answer,explanation\nAPI,HTTP Methods,Beginner,What is GET used for?,Read Data,GET is used to retrieve/read data.";
   }
   return "subject,topic,difficulty,question,answer\nSystem Design,Scaling,Advanced,What is horizontal scaling?,Adding more servers to handle traffic.";
 }

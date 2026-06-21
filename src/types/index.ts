@@ -7,6 +7,7 @@ export interface DashboardStats {
   totalQuestions: number;
   totalQuizQuestions: number;
   totalTheoryQuestions: number;
+  totalShortAnswerQuestions: number;
 }
 
 export interface RecentActivity {
@@ -26,6 +27,8 @@ export interface QuizQuestion {
   optionD: string | null;
   correctAnswer: string | null;
   explanation: string | null;
+  answer: string | null;
+  type: QuestionType;
   difficulty: Difficulty;
   subject: { id: string; name: string; slug: string } | null;
   topic: { id: string; name: string } | null;

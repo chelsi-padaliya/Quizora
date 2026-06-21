@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Loader2 } from "lucide-react";
@@ -23,8 +23,8 @@ import type { Question } from "@/types";
 interface QuestionFormProps {
   subjects: { id: string; name: string }[];
   topics: { id: string; name: string; subjectId: string }[];
-  question?: Question & { subject: { id: string; name: string }; topic: { id: string; name: string } | null };
-  fixedType?: "quiz" | "theory";
+  question?: Question & { subject: { id: string; name: string } | null; topic: { id: string; name: string } | null };
+  fixedType?: "quiz" | "theory" | "short_answer";
   onSuccess?: () => void;
   onCancel?: () => void;
 }
@@ -37,7 +37,6 @@ export function QuestionForm({
   onSuccess,
   onCancel,
 }: QuestionFormProps) {
-  const [filteredTopics, setFilteredTopics] = useState(topics);
   const [error, setError] = useState<string | null>(null);
 
   const {
@@ -50,7 +49,7 @@ export function QuestionForm({
     resolver: zodResolver(questionSchema),
     defaultValues: question
       ? {
-          subjectId: question.subjectId,
+          subjectId: question.subjectId ?? undefined,
           topicId: question.topicId ?? undefined,
           type: question.type,
           difficulty: question.difficulty,
@@ -65,18 +64,14 @@ export function QuestionForm({
         }
       : {
           type: fixedType ?? "quiz",
-          difficulty: "beginner",
+          difficulty: "beginner" as const,
         },
   });
 
-  const subjectId = watch("subjectId");
+  const subjectId = watch("subjectId") ?? "";
   const questionType = fixedType ?? watch("type");
+  const filteredTopics = topics.filter((t) => t.subjectId === (subjectId ?? ""));
 
-  useEffect(() => {
-    if (subjectId) {
-      setFilteredTopics(topics.filter((t) => t.subjectId === subjectId));
-    }
-  }, [subjectId, topics]);
 
   const onSubmit = async (data: QuestionInput) => {
     setError(null);
@@ -103,7 +98,7 @@ export function QuestionForm({
           <Label>Subject</Label>
           <Select
             value={subjectId}
-            onValueChange={(v) => setValue("subjectId", v)}
+            onValueChange={(v) => { setValue("subjectId", v); setValue("topicId", undefined); }}
           >
             <SelectTrigger>
               <SelectValue placeholder="Select subject" />
@@ -142,6 +137,27 @@ export function QuestionForm({
           </Select>
         </div>
       </div>
+
+      {filteredTopics.length > 0 && (
+        <div className="space-y-2">
+          <Label>Topic (optional)</Label>
+          <Select
+            value={watch("topicId") ?? ""}
+            onValueChange={(v) => setValue("topicId", v || undefined)}
+          >
+            <SelectTrigger>
+              <SelectValue placeholder="Select topic" />
+            </SelectTrigger>
+            <SelectContent>
+              {filteredTopics.map((t) => (
+                <SelectItem key={t.id} value={t.id}>
+                  {t.name}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+        </div>
+      )}
 
       <div className="space-y-2">
         <Label>Question</Label>
@@ -194,6 +210,22 @@ export function QuestionForm({
             <p className="text-sm text-destructive">{errors.answer.message}</p>
           )}
         </div>
+      )}
+
+      {questionType === "short_answer" && (
+        <>
+          <div className="space-y-2">
+            <Label>Correct Answer</Label>
+            <Input {...register("answer")} placeholder="e.g. Read Data" />
+            {errors.answer && (
+              <p className="text-sm text-destructive">{errors.answer.message}</p>
+            )}
+          </div>
+          <div className="space-y-2">
+            <Label>Explanation</Label>
+            <Textarea {...register("explanation")} rows={2} />
+          </div>
+        </>
       )}
 
       <div className="flex gap-2">

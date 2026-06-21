@@ -7,7 +7,7 @@ interface QuizFormProps {
   subjects: { id: string; name: string }[];
   topics: { id: string; name: string; subjectId: string }[];
   question?: Question & {
-    subject: { id: string; name: string };
+    subject: { id: string; name: string } | null;
     topic: { id: string; name: string } | null;
   };
   onSuccess?: () => void;

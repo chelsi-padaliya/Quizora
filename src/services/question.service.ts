@@ -11,15 +11,16 @@ import type {
 import { Difficulty, Prisma, QuestionType } from "@prisma/client";
 
 export async function getDashboardStats(): Promise<DashboardStats> {
-  const [totalSubjects, totalQuestions, totalQuizQuestions, totalTheoryQuestions] =
+  const [totalSubjects, totalQuestions, totalQuizQuestions, totalTheoryQuestions, totalShortAnswerQuestions] =
     await Promise.all([
       prisma.subject.count(),
       prisma.question.count(),
       prisma.question.count({ where: { type: "quiz" } }),
       prisma.question.count({ where: { type: "theory" } }),
+      prisma.question.count({ where: { type: "short_answer" } }),
     ]);
 
-  return { totalSubjects, totalQuestions, totalQuizQuestions, totalTheoryQuestions };
+  return { totalSubjects, totalQuestions, totalQuizQuestions, totalTheoryQuestions, totalShortAnswerQuestions };
 }
 
 export async function getRecentActivity(limit = 10): Promise<RecentActivity[]> {
@@ -88,9 +89,10 @@ export async function getQuizQuestions(params: {
   subjectId?: string;
   difficulty?: Difficulty;
   limit?: number | "all";
+  type?: "quiz" | "short_answer";
 }): Promise<QuizQuestion[]> {
   const where: Prisma.QuestionWhereInput = {
-    type: "quiz",
+    type: params.type ?? "quiz",
     ...(params.subjectId && { subjectId: params.subjectId }),
     ...(params.difficulty && { difficulty: params.difficulty }),
   };
@@ -107,16 +109,14 @@ export async function getQuizQuestions(params: {
     const targetIds = shuffledIds.slice(0, params.limit);
 
     const questions = await prisma.question.findMany({
-      where: {
-        id: { in: targetIds },
-      },
+      where: { id: { in: targetIds } },
       include: {
         subject: { select: { id: true, name: true, slug: true } },
         topic: { select: { id: true, name: true } },
       },
     });
 
-    return shuffleArray(questions);
+    return shuffleArray(questions) as unknown as QuizQuestion[];
   }
 
   const questions = await prisma.question.findMany({
@@ -127,7 +127,7 @@ export async function getQuizQuestions(params: {
     },
   });
 
-  return shuffleArray(questions);
+  return shuffleArray(questions) as unknown as QuizQuestion[];
 }
 
 export async function getTheoryQuestions(params: {
@@ -168,7 +168,7 @@ export async function getTheoryQuestions(params: {
   ]);
 
   return {
-    data,
+    data: data as unknown as TheoryQuestionItem[],
     total,
     page,
     totalPages: Math.ceil(total / limit),

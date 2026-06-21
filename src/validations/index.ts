@@ -8,7 +8,7 @@ export const loginSchema = z.object({
 export const questionSchema = z.object({
   subjectId: z.string().optional().nullable(),
   topicId: z.string().optional().nullable(),
-  type: z.enum(["quiz", "theory"]),
+  type: z.enum(["quiz", "theory", "short_answer"]),
   difficulty: z.enum(["beginner", "intermediate", "advanced"]).default("beginner"),
   question: z.string().optional().nullable(),
   optionA: z.string().optional().nullable(),

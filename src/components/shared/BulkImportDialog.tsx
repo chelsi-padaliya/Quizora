@@ -203,7 +203,7 @@ export function BulkImportDialog({
         <DialogContent className="max-h-[90vh] max-w-3xl overflow-y-auto">
           <DialogHeader>
             <DialogTitle>
-              Bulk Import Format — {questionType === "quiz" ? "Quiz" : "Theory"} Questions
+              Bulk Import Format — {questionType === "quiz" ? "Quiz" : questionType === "short_answer" ? "Short Answer" : "Theory"} Questions
             </DialogTitle>
           </DialogHeader>
 

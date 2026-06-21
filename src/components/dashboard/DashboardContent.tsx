@@ -1,4 +1,4 @@
-import { Brain, BookOpen, FolderOpen, HelpCircle } from "lucide-react";
+import { Brain, BookOpen, FolderOpen, HelpCircle, PenLine } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { QuizCard } from "@/components/QuizCard";
 import { SubjectCard } from "@/components/SubjectCard";
@@ -21,6 +21,7 @@ export async function DashboardContent() {
     { title: "Total Questions", value: stats.totalQuestions, icon: HelpCircle },
     { title: "Quiz Questions", value: stats.totalQuizQuestions, icon: Brain },
     { title: "Theory Questions", value: stats.totalTheoryQuestions, icon: BookOpen },
+    { title: "Short Answer", value: stats.totalShortAnswerQuestions, icon: PenLine },
   ];
 
   return (
@@ -32,7 +33,7 @@ export async function DashboardContent() {
         </p>
       </div>
 
-      <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+      <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5">
         {statCards.map((stat) => {
           const Icon = stat.icon;
           return (

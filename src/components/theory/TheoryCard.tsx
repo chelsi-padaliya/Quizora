@@ -48,7 +48,7 @@ export function TheoryCard({ questions }: TheoryCardProps) {
             </div>
           </AccordionTrigger>
           <AccordionContent>
-            <div className="rounded-md bg-muted/50 p-4 text-sm leading-relaxed">
+            <div className="rounded-md bg-muted/50 p-4 text-sm leading-relaxed" style={{ whiteSpace: "pre-wrap" }}>
               {q.answer ?? "No answer provided."}
             </div>
             {q.topic && (

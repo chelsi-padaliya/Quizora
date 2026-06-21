@@ -16,8 +16,10 @@ const QUESTION_PATHS = [
   "/admin/questions",
   "/admin/quiz-questions",
   "/admin/theory-questions",
+  "/admin/short-answer-questions",
   "/quiz",
   "/theory",
+  "/short-answer",
   "/search",
 ];
 
@@ -110,7 +112,7 @@ export async function duplicateQuestion(id: string): Promise<ActionResult<{ id: 
         topicId: original.topicId,
         type: original.type,
         difficulty: original.difficulty,
-        question: `${original.question} (Copy)`,
+        question: original.question ? `${original.question} (Copy)` : null,
         optionA: original.optionA,
         optionB: original.optionB,
         optionC: original.optionC,
@@ -147,7 +149,7 @@ import type { BulkImportRawRow, BulkImportPreviewRow, BulkImportResult } from "@
 export type { BulkImportRawRow, BulkImportPreviewRow, BulkImportResult };
 
 export interface BulkImportOptions {
-  type: "quiz" | "theory";
+  type: "quiz" | "theory" | "short_answer";
   skipDuplicates: boolean;
   updateExisting: boolean;
   dryRun?: boolean;
@@ -181,7 +183,7 @@ async function buildImportLookups() {
 function resolveRowToInput(
   row: BulkImportRawRow,
   rowIndex: number,
-  type: "quiz" | "theory",
+  type: "quiz" | "theory" | "short_answer",
   subjectMap: Map<string, string>,
   topicMap: Map<string, string>
 ): { input?: QuestionInput; error?: string } {
@@ -229,7 +231,7 @@ function resolveRowToInput(
 
 export async function previewBulkImport(
   rows: BulkImportRawRow[],
-  type: "quiz" | "theory"
+  type: "quiz" | "theory" | "short_answer"
 ): Promise<ActionResult<{ preview: BulkImportPreviewRow[]; duplicateCount: number }>> {
   try {
     await requireAdmin();
@@ -241,7 +243,7 @@ export async function previewBulkImport(
     });
 
     const duplicateSet = new Set(
-      existingQuestions.map((q) => `${q.subjectId}:${q.question.trim().toLowerCase()}`)
+      existingQuestions.map((q) => `${q.subjectId}:${(q.question || "").trim().toLowerCase()}`)
     );
 
     let duplicateCount = 0;
@@ -250,7 +252,7 @@ export async function previewBulkImport(
       let isDuplicate = false;
 
       if (input) {
-        const key = `${input.subjectId}:${input.question.trim().toLowerCase()}`;
+        const key = `${input.subjectId}:${(input.question || "").trim().toLowerCase()}`;
         isDuplicate = duplicateSet.has(key);
         if (isDuplicate) duplicateCount++;
       }
@@ -284,7 +286,7 @@ export async function bulkImportQuestionsFromRows(
 
     const duplicateMap = new Map<string, string>();
     existingQuestions.forEach((q) => {
-      duplicateMap.set(`${q.subjectId}:${q.question.trim().toLowerCase()}`, q.id);
+      duplicateMap.set(`${q.subjectId}:${(q.question || "").trim().toLowerCase()}`, q.id);
     });
 
     const result: BulkImportResult = {
@@ -313,7 +315,7 @@ export async function bulkImportQuestionsFromRows(
         continue;
       }
 
-      const dupKey = `${input.subjectId}:${input.question.trim().toLowerCase()}`;
+      const dupKey = `${input.subjectId}:${(input.question || "").trim().toLowerCase()}`;
       const existingId = duplicateMap.get(dupKey);
 
       if (existingId && existingId !== "new") {
