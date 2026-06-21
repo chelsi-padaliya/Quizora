@@ -1,0 +1,104 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum QuestionType {
+  quiz
+  theory
+}
+
+enum Difficulty {
+  beginner
+  intermediate
+  advanced
+}
+
+model User {
+  id            String        @id @default(cuid())
+  name          String?
+  email         String        @unique
+  password      String
+  role          String        @default("admin")
+  createdAt     DateTime      @default(now())
+  updatedAt     DateTime      @updatedAt
+  quizAttempts  QuizAttempt[]
+
+  @@index([email])
+}
+
+model Subject {
+  id           String        @id @default(cuid())
+  name         String        @unique
+  slug         String        @unique
+  createdAt    DateTime      @default(now())
+  updatedAt    DateTime      @updatedAt
+  topics       Topic[]
+  questions    Question[]
+  quizAttempts QuizAttempt[]
+
+  @@index([slug])
+}
+
+model Topic {
+  id        String     @id @default(cuid())
+  subjectId String
+  name      String
+  createdAt DateTime   @default(now())
+  updatedAt DateTime   @updatedAt
+  subject   Subject    @relation(fields: [subjectId], references: [id], onDelete: Cascade)
+  questions Question[]
+
+  @@unique([subjectId, name])
+  @@index([subjectId])
+}
+
+model Question {
+  id            String       @id @default(cuid())
+  subjectId     String?
+  topicId       String?
+  type          QuestionType
+  difficulty    Difficulty   @default(beginner)
+  question      String?
+  optionA       String?
+  optionB       String?
+  optionC       String?
+  optionD       String?
+  correctAnswer String?
+  explanation   String?
+  answer        String?
+  createdAt     DateTime     @default(now())
+  updatedAt     DateTime     @updatedAt
+  subject       Subject?     @relation(fields: [subjectId], references: [id], onDelete: Cascade)
+  topic         Topic?       @relation(fields: [topicId], references: [id], onDelete: SetNull)
+
+  @@index([subjectId])
+  @@index([topicId])
+  @@index([type])
+  @@index([difficulty])
+  @@index([createdAt])
+  @@index([subjectId, type, difficulty])
+}
+
+model QuizAttempt {
+  id             String   @id @default(cuid())
+  userId         String
+  subjectId      String?
+  score          Float
+  totalQuestions Int
+  correctAnswers Int
+  wrongAnswers   Int
+  answers        Json?
+  createdAt      DateTime @default(now())
+  user           User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  subject        Subject? @relation(fields: [subjectId], references: [id], onDelete: SetNull)
+
+  @@index([userId])
+  @@index([subjectId])
+  @@index([createdAt])
+  @@index([userId, createdAt])
+}

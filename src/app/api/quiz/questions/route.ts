@@ -1,0 +1,25 @@
+import { NextRequest, NextResponse } from "next/server";
+import { auth } from "@/auth";
+import { getQuizQuestions } from "@/services/question.service";
+import { Difficulty } from "@prisma/client";
+
+export async function GET(request: NextRequest) {
+  const session = await auth();
+  if (!session) {
+    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+  }
+
+  const { searchParams } = request.nextUrl;
+  const subjectId = searchParams.get("subjectId") ?? undefined;
+  const difficulty = searchParams.get("difficulty") as Difficulty | null;
+  const limitParam = searchParams.get("limit") ?? "10";
+  const limit = limitParam === "all" ? "all" : Number(limitParam);
+
+  const questions = await getQuizQuestions({
+    subjectId,
+    difficulty: difficulty ?? undefined,
+    limit: limit as number | "all",
+  });
+
+  return NextResponse.json({ questions });
+}
