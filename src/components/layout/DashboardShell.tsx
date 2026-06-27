@@ -7,12 +7,13 @@ import { MobileSidebar } from "@/components/layout/MobileSidebar";
 
 interface DashboardShellProps {
   user?: { name?: string | null; email?: string | null; role?: string };
+  isAdmin?: boolean;
   children: React.ReactNode;
 }
 
 const SIDEBAR_KEY = "sidebar-collapsed";
 
-export function DashboardShell({ user, children }: DashboardShellProps) {
+export function DashboardShell({ user, isAdmin = false, children }: DashboardShellProps) {
   const [mobileOpen, setMobileOpen] = useState(false);
   const [collapsed, setCollapsed] = useState(false);
   const [mounted, setMounted] = useState(false);
@@ -30,8 +31,6 @@ export function DashboardShell({ user, children }: DashboardShellProps) {
       return next;
     });
   }, []);
-
-  const isAdmin = user?.role === "admin";
 
   return (
     <div className="flex h-screen flex-col overflow-hidden">

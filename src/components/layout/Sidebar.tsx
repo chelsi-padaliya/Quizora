@@ -58,43 +58,45 @@ export function Sidebar({ collapsed, onToggleCollapse, isAdmin }: SidebarProps) 
         collapsed ? "w-16" : "w-64"
       )}
     >
-      <div className="flex h-full flex-col overflow-hidden">
-        <nav className="shrink-0 space-y-1 p-4">
-          {MAIN_NAV_ITEMS.map((item) => (
-            <NavLink
-              key={item.href}
-              href={item.href}
-              label={item.label}
-              icon={item.icon}
-              isActive={isActive(item.href)}
-              collapsed={collapsed}
-            />
-          ))}
-        </nav>
+      <div className="flex h-full flex-col">
+        <div className="flex-1 overflow-y-auto">
+          <nav className="space-y-1 p-4">
+            {MAIN_NAV_ITEMS.map((item) => (
+              <NavLink
+                key={item.href}
+                href={item.href}
+                label={item.label}
+                icon={item.icon}
+                isActive={isActive(item.href)}
+                collapsed={collapsed}
+              />
+            ))}
+          </nav>
 
-        {isAdmin && (
-          <div className="shrink-0 border-t px-4 py-3">
-            {!collapsed && (
-              <p className="mb-2 px-3 text-xs font-semibold uppercase tracking-wider text-muted-foreground">
-                Admin
-              </p>
-            )}
-            <div className="space-y-1">
-              {ADMIN_NAV_ITEMS.map((item) => (
-                <NavLink
-                  key={item.href}
-                  href={item.href}
-                  label={item.label}
-                  icon={item.icon}
-                  isActive={isActive(item.href)}
-                  collapsed={collapsed}
-                />
-              ))}
+          {isAdmin && (
+            <div className="border-t px-4 py-3">
+              {!collapsed && (
+                <p className="mb-2 px-3 text-xs font-semibold uppercase tracking-wider text-muted-foreground">
+                  Admin
+                </p>
+              )}
+              <div className="space-y-1">
+                {ADMIN_NAV_ITEMS.map((item) => (
+                  <NavLink
+                    key={item.href}
+                    href={item.href}
+                    label={item.label}
+                    icon={item.icon}
+                    isActive={isActive(item.href)}
+                    collapsed={collapsed}
+                  />
+                ))}
+              </div>
             </div>
-          </div>
-        )}
+          )}
+        </div>
 
-        <div className="mt-auto shrink-0 border-t p-2">
+        <div className="shrink-0 border-t p-2">
           <Button
             variant="ghost"
             size="sm"

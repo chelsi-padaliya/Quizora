@@ -205,7 +205,7 @@ export function QuestionManagerClient({
               trigger={
                 <Button variant="outline" onClick={() => setImportOpen(true)}>
                   <Upload className="mr-2 h-4 w-4" />
-                  Bulk Import Format
+                  Import Excel / CSV
                 </Button>
               }
             />
