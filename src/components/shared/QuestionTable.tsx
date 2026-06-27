@@ -21,6 +21,7 @@ interface QuestionTableProps {
   onDuplicate?: (id: string) => void;
   isDeleting?: string | null;
   showType?: boolean;
+  startIndex?: number;
 }
 
 function QuestionTableComponent({
@@ -30,6 +31,7 @@ function QuestionTableComponent({
   onDuplicate,
   isDeleting,
   showType = true,
+  startIndex = 0,
 }: QuestionTableProps) {
   const handleEdit = useCallback((q: QuestionRow) => () => onEdit(q), [onEdit]);
   const handleDelete = useCallback((id: string) => () => onDelete(id), [onDelete]);
@@ -44,12 +46,13 @@ function QuestionTableComponent({
 
   return (
     <div className="space-y-3">
-      {questions.map((q) => (
+      {questions.map((q, index) => (
         <Card key={q.id}>
           <CardHeader className="pb-2">
             <div className="flex items-start justify-between gap-4">
               <div className="flex-1 min-w-0">
                 <div className="mb-2 flex flex-wrap gap-2">
+                  <Badge variant="secondary">#{startIndex + index + 1}</Badge>
                   <Badge variant="secondary">{q.subject?.name || "N/A"}</Badge>
                   {q.topic && <Badge variant="outline">{q.topic.name}</Badge>}
                   {showType && <Badge variant="outline">{q.type}</Badge>}

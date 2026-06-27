@@ -16,7 +16,7 @@ import { QuestionTable, QuestionTableSkeleton, type QuestionRow } from "@/compon
 import { PaginationControls } from "@/components/shared/PaginationControls";
 import { SearchBar } from "@/components/shared/SearchBar";
 import { FilterDropdown } from "@/components/shared/FilterDropdown";
-import { DIFFICULTIES } from "@/constants";
+import { DIFFICULTIES, ITEMS_PER_PAGE } from "@/constants";
 import { useDebounce } from "@/hooks/use-debounce";
 import {
   deleteQuestion,
@@ -228,6 +228,7 @@ export function QuestionManagerClient({
           onDuplicate={showDuplicate ? handleDuplicate : undefined}
           isDeleting={deletingId}
           showType={!fixedType}
+          startIndex={(page - 1) * ITEMS_PER_PAGE}
         />
       )}
 

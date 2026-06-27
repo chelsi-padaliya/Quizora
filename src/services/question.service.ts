@@ -204,7 +204,7 @@ export async function getQuestions(params: {
       where,
       skip,
       take: limit,
-      orderBy: { createdAt: "desc" },
+      orderBy: [{ createdAt: "asc" }, { id: "asc" }],
       include: {
         subject: true,
         topic: true,
