@@ -158,7 +158,7 @@ export function QuizPlayer({ subjects, initialQuestions, initialSubjectId }: Qui
             </div>
             <div className="space-y-2">
               <Label>Timer (optional)</Label>
-              <div className="flex items-center gap-4">
+              <div className="flex flex-wrap items-center gap-4">
                 <Switch checked={timerEnabled} onCheckedChange={setTimerEnabled} />
                 {timerEnabled && (
                   <Select
@@ -205,7 +205,7 @@ export function QuizPlayer({ subjects, initialQuestions, initialSubjectId }: Qui
 
   return (
     <div className="space-y-4">
-      <div className="flex items-center justify-between">
+      <div className="flex flex-wrap items-center justify-between gap-2">
         <span className="text-sm text-muted-foreground">
           Question {currentIndex + 1} of {questions.length}
         </span>
@@ -220,7 +220,7 @@ export function QuizPlayer({ subjects, initialQuestions, initialSubjectId }: Qui
 
       <Card>
         <CardHeader>
-          <div className="flex items-center gap-2 text-sm text-muted-foreground">
+          <div className="flex flex-wrap items-center gap-2 text-sm text-muted-foreground">
             <span>{currentQuestion.subject?.name || "General"}</span>
             <span>•</span>
             <span className="capitalize">{currentQuestion.difficulty}</span>
@@ -236,10 +236,10 @@ export function QuizPlayer({ subjects, initialQuestions, initialSubjectId }: Qui
             {options.map((option) => (
               <label
                 key={option.key}
-                className="flex cursor-pointer items-center gap-3 rounded-lg border p-4 transition-colors hover:bg-accent"
+                className="flex cursor-pointer items-start gap-3 rounded-lg border p-3 transition-colors hover:bg-accent sm:items-center sm:p-4"
               >
-                <RadioGroupItem value={option.key} />
-                <span>
+                <RadioGroupItem value={option.key} className="mt-0.5 sm:mt-0" />
+                <span className="min-w-0 break-words">
                   <span className="font-medium">{option.key}.</span> {option.value}
                 </span>
               </label>
@@ -248,27 +248,28 @@ export function QuizPlayer({ subjects, initialQuestions, initialSubjectId }: Qui
         </CardContent>
       </Card>
 
-      <div className="flex flex-wrap items-center justify-between gap-2">
+      <div className="flex flex-col gap-2 sm:flex-row sm:flex-wrap sm:items-center sm:justify-between">
         <Button
           variant="outline"
           onClick={() => setCurrentIndex((i) => Math.max(0, i - 1))}
           disabled={currentIndex === 0}
+          className="w-full sm:w-auto"
         >
           <ChevronLeft className="mr-1 h-4 w-4" />
           Previous
         </Button>
-        <div className="flex gap-2">
-          <Button variant="outline" onClick={handleSkip}>
+        <div className="flex flex-col gap-2 sm:flex-row">
+          <Button variant="outline" onClick={handleSkip} className="w-full sm:w-auto">
             <SkipForward className="mr-1 h-4 w-4" />
             Skip
           </Button>
           {currentIndex < questions.length - 1 ? (
-            <Button onClick={() => setCurrentIndex((i) => i + 1)}>
+            <Button onClick={() => setCurrentIndex((i) => i + 1)} className="w-full sm:w-auto">
               Next
               <ChevronRight className="ml-1 h-4 w-4" />
             </Button>
           ) : (
-            <Button onClick={handleSubmit}>
+            <Button onClick={handleSubmit} className="w-full sm:w-auto">
               <Send className="mr-1 h-4 w-4" />
               Submit Quiz
             </Button>

@@ -36,7 +36,7 @@ export function FilterDropdown({
       value={value ?? "all"}
       onValueChange={(v) => onChange(v === "all" ? undefined : v)}
     >
-      <SelectTrigger className={cn("w-[160px]", className)}>
+      <SelectTrigger className={cn("w-full sm:w-[160px]", className)}>
         <SelectValue placeholder={placeholder} />
       </SelectTrigger>
       <SelectContent>

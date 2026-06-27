@@ -30,11 +30,11 @@ export function QuizResultsContent() {
   return (
     <div className="mx-auto max-w-3xl space-y-6">
       <ResultCard result={result} />
-      <div className="flex gap-4">
-        <Button asChild>
+      <div className="flex flex-col gap-2 sm:flex-row sm:gap-4">
+        <Button asChild className="w-full sm:w-auto">
           <Link href="/quiz">Take Another Quiz</Link>
         </Button>
-        <Button variant="outline" asChild>
+        <Button variant="outline" asChild className="w-full sm:w-auto">
           <Link href="/dashboard">Back to Dashboard</Link>
         </Button>
       </div>

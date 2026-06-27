@@ -27,7 +27,7 @@ export function QuestionCard({
           <Badge variant="outline">{type}</Badge>
           <Badge variant="outline" className="capitalize">{difficulty}</Badge>
         </div>
-        <CardTitle className="text-base font-medium">{question}</CardTitle>
+        <CardTitle className="break-words text-base font-medium">{question}</CardTitle>
       </CardHeader>
       {children && <CardContent>{children}</CardContent>}
     </Card>

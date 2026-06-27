@@ -15,11 +15,11 @@ export function SubjectCard({ name, slug, questionCount, href, className }: Subj
     <Link href={href}>
       <Card className={cn("transition-shadow hover:shadow-md", className)}>
         <CardHeader className="pb-2">
-          <CardTitle className="text-lg">{name}</CardTitle>
+          <CardTitle className="break-words text-lg">{name}</CardTitle>
         </CardHeader>
         <CardContent>
           <p className="text-sm text-muted-foreground">{questionCount} questions</p>
-          <p className="mt-1 text-xs text-muted-foreground">{slug}</p>
+          <p className="mt-1 break-words text-xs text-muted-foreground">{slug}</p>
         </CardContent>
       </Card>
     </Link>

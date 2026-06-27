@@ -39,7 +39,7 @@ export function ResultCard({ result, showReview = true }: ResultCardProps) {
             <p className="text-4xl font-bold">{score}%</p>
             <Progress value={score} className="mt-2" />
           </div>
-          <div className="grid grid-cols-3 gap-4 text-center">
+          <div className="grid grid-cols-3 gap-2 text-center sm:gap-4">
             <div>
               <p className="text-2xl font-semibold">{totalQuestions}</p>
               <p className="text-sm text-muted-foreground">Total</p>
@@ -79,7 +79,7 @@ export function ResultCard({ result, showReview = true }: ResultCardProps) {
                       <p className="font-medium">
                         {index + 1}. {q.question}
                       </p>
-                      <div className="mt-2 space-y-1 text-sm">
+                      <div className="mt-2 space-y-1 break-words text-sm">
                         <p>
                           Your answer:{" "}
                           <span className={cn(isCorrect ? "text-green-600" : "text-red-600")}>

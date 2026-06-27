@@ -101,12 +101,12 @@ export function TopicManagerClient({
   return (
     <div className="space-y-6">
       <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
-        <div className="flex flex-1 flex-wrap gap-2">
+        <div className="flex min-w-0 flex-1 flex-col gap-2 sm:flex-row sm:flex-wrap">
           <SearchBar
             value={search}
             onChange={setSearch}
             placeholder="Search topics..."
-            className="min-w-[200px] flex-1"
+            className="w-full min-w-0 flex-1 sm:min-w-[200px]"
           />
           <FilterDropdown
             value={subjectFilter}
@@ -118,7 +118,7 @@ export function TopicManagerClient({
         </div>
         <Dialog open={createOpen} onOpenChange={setCreateOpen}>
           <DialogTrigger asChild>
-            <Button>
+            <Button className="w-full sm:w-auto">
               <Plus className="mr-2 h-4 w-4" />
               Add Topic
             </Button>

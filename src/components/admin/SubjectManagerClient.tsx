@@ -95,11 +95,11 @@ export function SubjectManagerClient({
           value={search}
           onChange={setSearch}
           placeholder="Search subjects..."
-          className="max-w-sm flex-1"
+          className="w-full flex-1 sm:max-w-sm"
         />
         <Dialog open={createOpen} onOpenChange={setCreateOpen}>
           <DialogTrigger asChild>
-            <Button>
+            <Button className="w-full sm:w-auto">
               <Plus className="mr-2 h-4 w-4" />
               Add Subject
             </Button>

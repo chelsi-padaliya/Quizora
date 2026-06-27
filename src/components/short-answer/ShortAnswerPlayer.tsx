@@ -125,7 +125,7 @@ export function ShortAnswerPlayer({ subjects, initialSubjectId }: ShortAnswerPla
           <div className="space-y-2">
             <Label>Question Limit</Label>
             <Select value={limit} onValueChange={setLimit}>
-              <SelectTrigger className="w-40">
+              <SelectTrigger className="w-full sm:w-40">
                 <SelectValue />
               </SelectTrigger>
               <SelectContent>
@@ -211,7 +211,7 @@ export function ShortAnswerPlayer({ subjects, initialSubjectId }: ShortAnswerPla
 
   return (
     <div className="space-y-4">
-      <div className="flex items-center justify-between">
+      <div className="flex flex-wrap items-center justify-between gap-2">
         <span className="text-sm text-muted-foreground">
           Question {currentIndex + 1} of {questions.length}
         </span>
@@ -224,7 +224,7 @@ export function ShortAnswerPlayer({ subjects, initialSubjectId }: ShortAnswerPla
 
       <Card>
         <CardHeader>
-          <div className="flex items-center gap-2 text-sm text-muted-foreground">
+          <div className="flex flex-wrap items-center gap-2 text-sm text-muted-foreground">
             <span>{currentQuestion.subject?.name || "General"}</span>
             <span>•</span>
             <span className="capitalize">{currentQuestion.difficulty}</span>
@@ -258,7 +258,7 @@ export function ShortAnswerPlayer({ subjects, initialSubjectId }: ShortAnswerPla
           </div>
 
           {!isAnswered ? (
-            <Button onClick={handleSubmitAnswer} disabled={!inputValue.trim()}>
+            <Button onClick={handleSubmitAnswer} disabled={!inputValue.trim()} className="w-full sm:w-auto">
               Submit Answer
             </Button>
           ) : (
@@ -294,12 +294,12 @@ export function ShortAnswerPlayer({ subjects, initialSubjectId }: ShortAnswerPla
         </CardContent>
       </Card>
 
-      <div className="flex items-center justify-between">
-        <Button variant="outline" onClick={goToPrev} disabled={currentIndex === 0}>
+      <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
+        <Button variant="outline" onClick={goToPrev} disabled={currentIndex === 0} className="w-full sm:w-auto">
           <ChevronLeft className="mr-1 h-4 w-4" />
           Previous
         </Button>
-        <Button onClick={goToNext} disabled={!isAnswered}>
+        <Button onClick={goToNext} disabled={!isAnswered} className="w-full sm:w-auto">
           {currentIndex < questions.length - 1 ? (
             <>
               Next

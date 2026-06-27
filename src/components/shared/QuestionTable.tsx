@@ -49,20 +49,24 @@ function QuestionTableComponent({
       {questions.map((q, index) => (
         <Card key={q.id}>
           <CardHeader className="pb-2">
-            <div className="flex items-start justify-between gap-4">
-              <div className="flex-1 min-w-0">
-                <div className="mb-2 flex flex-wrap gap-2">
-                  <Badge variant="secondary">#{startIndex + index + 1}</Badge>
-                  <Badge variant="secondary">{q.subject?.name || "N/A"}</Badge>
-                  {q.topic && <Badge variant="outline">{q.topic.name}</Badge>}
-                  {showType && <Badge variant="outline">{q.type}</Badge>}
-                  <Badge variant="outline" className="capitalize">
-                    {q.difficulty}
-                  </Badge>
+            <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between sm:gap-4">
+              <div className="flex min-w-0 flex-1 items-start gap-3">
+                <div className="flex h-8 min-w-8 items-center justify-center rounded-md bg-secondary px-2 text-sm font-semibold text-secondary-foreground">
+                  #{startIndex + index + 1}
                 </div>
-                <CardTitle className="text-base font-medium">{q.question}</CardTitle>
+                <div className="min-w-0 flex-1">
+                  <div className="mb-2 flex flex-wrap gap-2">
+                    <Badge variant="secondary">{q.subject?.name || "N/A"}</Badge>
+                    {q.topic && <Badge variant="outline">{q.topic.name}</Badge>}
+                    {showType && <Badge variant="outline">{q.type}</Badge>}
+                    <Badge variant="outline" className="capitalize">
+                      {q.difficulty}
+                    </Badge>
+                  </div>
+                  <CardTitle className="text-base font-medium">{q.question}</CardTitle>
+                </div>
               </div>
-              <div className="flex shrink-0 gap-1">
+              <div className="flex shrink-0 self-end gap-1 sm:self-start">
                 {onDuplicate && (
                   <Button variant="ghost" size="icon" onClick={handleDuplicate(q.id)}>
                     <Copy className="h-4 w-4" />

@@ -151,12 +151,12 @@ export function QuestionManagerClient({
   return (
     <div className="space-y-6">
       <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
-        <div className="flex flex-1 flex-wrap gap-2">
+        <div className="flex min-w-0 flex-1 flex-col gap-2 sm:flex-row sm:flex-wrap">
           <SearchBar
             value={search}
             onChange={setSearch}
             placeholder="Search questions..."
-            className="min-w-[200px] flex-1"
+            className="w-full min-w-0 flex-1 sm:min-w-[200px]"
           />
           <FilterDropdown
             value={subjectFilter}
@@ -173,10 +173,10 @@ export function QuestionManagerClient({
             allLabel="All Levels"
           />
         </div>
-        <div className="flex flex-wrap gap-2">
+        <div className="flex flex-col gap-2 sm:flex-row sm:flex-wrap">
           <Dialog open={createOpen} onOpenChange={setCreateOpen}>
             <DialogTrigger asChild>
-              <Button>
+              <Button className="w-full sm:w-auto">
                 <Plus className="mr-2 h-4 w-4" />
                 Add {title}
               </Button>
@@ -203,7 +203,7 @@ export function QuestionManagerClient({
               questionType={fixedType}
               onComplete={() => startTransition(() => router.refresh())}
               trigger={
-                <Button variant="outline" onClick={() => setImportOpen(true)}>
+                <Button variant="outline" onClick={() => setImportOpen(true)} className="w-full sm:w-auto">
                   <Upload className="mr-2 h-4 w-4" />
                   Import Excel / CSV
                 </Button>

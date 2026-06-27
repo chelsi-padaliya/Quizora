@@ -36,8 +36,8 @@ function TopicTableComponent({ topics, onEdit, onDelete, isDeleting }: TopicTabl
       {topics.map((t) => (
         <Card key={t.id}>
           <CardHeader className="pb-2">
-            <div className="flex items-start justify-between gap-4">
-              <div className="flex-1">
+            <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between sm:gap-4">
+              <div className="min-w-0 flex-1">
                 <div className="mb-2 flex flex-wrap gap-2">
                   <Badge variant="secondary">{t.subject.name}</Badge>
                   {t._count && (
@@ -46,7 +46,7 @@ function TopicTableComponent({ topics, onEdit, onDelete, isDeleting }: TopicTabl
                 </div>
                 <CardTitle className="text-base font-medium">{t.name}</CardTitle>
               </div>
-              <div className="flex gap-1">
+              <div className="flex self-end gap-1 sm:self-start">
                 <Button variant="ghost" size="icon" onClick={handleEdit(t)}>
                   <Pencil className="h-4 w-4" />
                 </Button>

@@ -218,12 +218,12 @@ export function BulkImportDialog({
 
               <div className="space-y-2">
                 <p className="text-sm font-medium">Download Sample</p>
-                <div className="flex flex-wrap gap-2">
-                  <Button variant="outline" size="sm" onClick={handleDownloadCsv}>
+                <div className="flex flex-col gap-2 sm:flex-row sm:flex-wrap">
+                  <Button variant="outline" size="sm" onClick={handleDownloadCsv} className="w-full sm:w-auto">
                     <Download className="mr-2 h-4 w-4" />
                     Download Sample CSV
                   </Button>
-                  <Button variant="outline" size="sm" onClick={handleDownloadExcel}>
+                  <Button variant="outline" size="sm" onClick={handleDownloadExcel} className="w-full sm:w-auto">
                     <Download className="mr-2 h-4 w-4" />
                     Download Sample Excel
                   </Button>
@@ -232,12 +232,13 @@ export function BulkImportDialog({
 
               <div className="space-y-2">
                 <p className="text-sm font-medium">Upload File</p>
-                <div className="flex flex-wrap gap-2">
+                <div className="flex flex-col gap-2 sm:flex-row sm:flex-wrap">
                   <Button
                     variant="outline"
                     size="sm"
                     onClick={() => csvInputRef.current?.click()}
                     disabled={loading}
+                    className="w-full sm:w-auto"
                   >
                     <FileText className="mr-2 h-4 w-4" />
                     Upload CSV
@@ -247,6 +248,7 @@ export function BulkImportDialog({
                     size="sm"
                     onClick={() => excelInputRef.current?.click()}
                     disabled={loading}
+                    className="w-full sm:w-auto"
                   >
                     <FileSpreadsheet className="mr-2 h-4 w-4" />
                     Upload Excel
@@ -256,6 +258,7 @@ export function BulkImportDialog({
                     size="sm"
                     onClick={() => jsonInputRef.current?.click()}
                     disabled={loading}
+                    className="w-full sm:w-auto"
                   >
                     <Upload className="mr-2 h-4 w-4" />
                     Upload JSON
@@ -333,8 +336,8 @@ export function BulkImportDialog({
                 </div>
               </div>
 
-              <div className="max-h-[300px] overflow-y-auto rounded-md border">
-                <table className="w-full text-sm">
+              <div className="max-h-[300px] overflow-auto rounded-md border">
+                <table className="min-w-[520px] w-full text-sm">
                   <thead className="sticky top-0 bg-muted">
                     <tr>
                       <th className="px-3 py-2 text-left font-medium">#</th>
@@ -371,11 +374,11 @@ export function BulkImportDialog({
                 </div>
               )}
 
-              <div className="flex gap-2">
-                <Button variant="outline" onClick={() => setStep("upload")} disabled={loading}>
+              <div className="flex flex-col gap-2 sm:flex-row">
+                <Button variant="outline" onClick={() => setStep("upload")} disabled={loading} className="w-full sm:w-auto">
                   Back
                 </Button>
-                <Button onClick={handleImport} disabled={loading || validCount === 0}>
+                <Button onClick={handleImport} disabled={loading || validCount === 0} className="w-full sm:w-auto">
                   <Upload className="mr-2 h-4 w-4" />
                   {loading ? "Importing..." : `Import ${validCount} Question${validCount !== 1 ? "s" : ""}`}
                 </Button>
@@ -430,7 +433,7 @@ export function BulkImportDialog({
                 </div>
               )}
 
-              <Button onClick={() => handleOpenChange(false)}>Done</Button>
+              <Button onClick={() => handleOpenChange(false)} className="w-full sm:w-auto">Done</Button>
             </div>
           )}
         </DialogContent>

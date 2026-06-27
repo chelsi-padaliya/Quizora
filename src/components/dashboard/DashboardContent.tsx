@@ -64,8 +64,8 @@ export async function DashboardContent() {
             ) : (
               <div className="space-y-4">
                 {activity.map((item) => (
-                  <div key={item.id} className="flex items-start justify-between border-b pb-3 last:border-0">
-                    <div>
+                  <div key={item.id} className="flex flex-col gap-1 border-b pb-3 last:border-0 sm:flex-row sm:items-start sm:justify-between">
+                    <div className="min-w-0">
                       <p className="text-sm font-medium">{item.title}</p>
                       <p className="text-xs text-muted-foreground">{item.description}</p>
                     </div>
