@@ -57,14 +57,14 @@ export function Navbar({ user, isAdmin, onMenuClick }: NavbarProps) {
 
   return (
     <header className="sticky top-0 z-40 shrink-0 border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
-      <div className="flex h-16 items-center gap-4 px-4 lg:px-6">
-        <Button variant="ghost" size="icon" className="lg:hidden" onClick={onMenuClick}>
+      <div className="flex h-16 items-center gap-3 px-4 lg:gap-4 lg:px-6">
+        <Button variant="ghost" size="icon" className="h-9 w-9 lg:hidden" onClick={onMenuClick}>
           <Menu className="h-5 w-5" />
         </Button>
 
-        <Link href={ROUTES.dashboard} className="flex items-center gap-2 font-semibold">
+        <Link href={ROUTES.dashboard} className="flex min-w-0 items-center gap-2 font-semibold">
           <Brain className="h-6 w-6 text-primary" />
-          <span className="hidden sm:inline">{APP_NAME}</span>
+          <span className="truncate">{APP_NAME}</span>
         </Link>
 
         <div className="mx-auto hidden max-w-md flex-1 md:block">

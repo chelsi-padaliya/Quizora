@@ -2,7 +2,7 @@
 
 import { useCallback, useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
-import { Clock, SkipForward, ChevronLeft, ChevronRight, Send } from "lucide-react";
+import { Clock, ChevronLeft, ChevronRight, Send } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Label } from "@/components/ui/label";
@@ -107,17 +107,6 @@ export function QuizPlayer({ subjects, initialQuestions, initialSubjectId }: Qui
       ...prev,
       [currentQuestion.id]: { selected: value, skipped: false },
     }));
-  };
-
-  const handleSkip = () => {
-    if (!currentQuestion) return;
-    setAnswers((prev) => ({
-      ...prev,
-      [currentQuestion.id]: { selected: null, skipped: true },
-    }));
-    if (currentIndex < questions.length - 1) {
-      setCurrentIndex((i) => i + 1);
-    }
   };
 
   const formatTime = (seconds: number) => {
@@ -248,28 +237,27 @@ export function QuizPlayer({ subjects, initialQuestions, initialSubjectId }: Qui
         </CardContent>
       </Card>
 
-      <div className="flex flex-col gap-2 sm:flex-row sm:flex-wrap sm:items-center sm:justify-between">
+      <div className="flex gap-3 sm:flex-row sm:flex-wrap sm:items-center sm:justify-between">
         <Button
           variant="outline"
           onClick={() => setCurrentIndex((i) => Math.max(0, i - 1))}
           disabled={currentIndex === 0}
-          className="w-full sm:w-auto"
+          className="h-9 flex-1 sm:h-10 sm:flex-none"
         >
           <ChevronLeft className="mr-1 h-4 w-4" />
           Previous
         </Button>
-        <div className="flex flex-col gap-2 sm:flex-row">
-          <Button variant="outline" onClick={handleSkip} className="w-full sm:w-auto">
-            <SkipForward className="mr-1 h-4 w-4" />
-            Skip
-          </Button>
+        <div className="flex flex-1 gap-3 sm:flex-none">
           {currentIndex < questions.length - 1 ? (
-            <Button onClick={() => setCurrentIndex((i) => i + 1)} className="w-full sm:w-auto">
+            <Button
+              onClick={() => setCurrentIndex((i) => i + 1)}
+              className="h-9 flex-1 sm:h-10 sm:flex-none"
+            >
               Next
               <ChevronRight className="ml-1 h-4 w-4" />
             </Button>
           ) : (
-            <Button onClick={handleSubmit} className="w-full sm:w-auto">
+            <Button onClick={handleSubmit} className="h-9 flex-1 sm:h-10 sm:flex-none">
               <Send className="mr-1 h-4 w-4" />
               Submit Quiz
             </Button>

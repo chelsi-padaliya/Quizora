@@ -33,19 +33,19 @@ export async function DashboardContent() {
         </p>
       </div>
 
-      <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5">
+      <div className="grid grid-cols-2 gap-3 sm:gap-4 lg:grid-cols-3 xl:grid-cols-5">
         {statCards.map((stat) => {
           const Icon = stat.icon;
           return (
             <Card key={stat.title}>
-              <CardHeader className="flex flex-row items-center justify-between pb-2">
-                <CardTitle className="text-sm font-medium text-muted-foreground">
+              <CardHeader className="flex flex-row items-center justify-between gap-2 p-4 pb-2 sm:p-6 sm:pb-2">
+                <CardTitle className="text-xs font-medium text-muted-foreground sm:text-sm">
                   {stat.title}
                 </CardTitle>
-                <Icon className="h-4 w-4 text-muted-foreground" />
+                <Icon className="h-4 w-4 shrink-0 text-muted-foreground" />
               </CardHeader>
-              <CardContent>
-                <p className="text-3xl font-bold">{stat.value}</p>
+              <CardContent className="p-4 pt-0 sm:p-6 sm:pt-0">
+                <p className="text-2xl font-bold sm:text-3xl">{stat.value}</p>
               </CardContent>
             </Card>
           );

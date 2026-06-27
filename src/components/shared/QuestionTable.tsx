@@ -1,7 +1,7 @@
 "use client";
 
 import { memo, useCallback } from "react";
-import { Copy, Pencil } from "lucide-react";
+import { Copy, Pencil, Trash2 } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardHeader, CardTitle } from "@/components/ui/card";
@@ -47,38 +47,71 @@ function QuestionTableComponent({
   return (
     <div className="space-y-3">
       {questions.map((q, index) => (
-        <Card key={q.id}>
-          <CardHeader className="pb-2">
-            <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between sm:gap-4">
-              <div className="flex min-w-0 flex-1 items-start gap-3">
-                <div className="flex h-8 min-w-8 items-center justify-center rounded-md bg-secondary px-2 text-sm font-semibold text-secondary-foreground">
-                  #{startIndex + index + 1}
+        <Card key={q.id} className="overflow-hidden">
+          <CardHeader className="p-4 sm:p-6">
+            <div className="flex min-w-0 flex-col gap-3 sm:flex-row sm:items-start sm:justify-between sm:gap-4">
+              <div className="flex min-w-0 flex-1 items-start gap-2.5 sm:gap-4">
+                <div className="w-8 shrink-0 pt-0.5 text-sm font-semibold tabular-nums text-muted-foreground sm:w-10 sm:text-base">
+                  {startIndex + index + 1}.
                 </div>
                 <div className="min-w-0 flex-1">
-                  <div className="mb-2 flex flex-wrap gap-2">
-                    <Badge variant="secondary">{q.subject?.name || "N/A"}</Badge>
-                    {q.topic && <Badge variant="outline">{q.topic.name}</Badge>}
-                    {showType && <Badge variant="outline">{q.type}</Badge>}
-                    <Badge variant="outline" className="capitalize">
+                  <div className="mb-2 flex min-w-0 flex-wrap gap-1.5 sm:gap-2">
+                    <Badge variant="secondary" className="max-w-full truncate px-2 py-0 text-[11px] sm:text-xs">
+                      {q.subject?.name || "N/A"}
+                    </Badge>
+                    {q.topic && (
+                      <Badge variant="outline" className="max-w-full truncate px-2 py-0 text-[11px] sm:text-xs">
+                        {q.topic.name}
+                      </Badge>
+                    )}
+                    {showType && (
+                      <Badge variant="outline" className="max-w-full truncate px-2 py-0 text-[11px] sm:text-xs">
+                        {q.type}
+                      </Badge>
+                    )}
+                    <Badge variant="outline" className="max-w-full truncate px-2 py-0 text-[11px] capitalize sm:text-xs">
                       {q.difficulty}
                     </Badge>
                   </div>
-                  <CardTitle className="text-base font-medium">{q.question}</CardTitle>
+                  <CardTitle className="break-words text-sm font-medium leading-snug sm:text-base sm:leading-snug">
+                    {q.question}
+                  </CardTitle>
                 </div>
               </div>
-              <div className="flex shrink-0 self-end gap-1 sm:self-start">
+              <div className="flex shrink-0 justify-end gap-1 sm:self-start">
                 {onDuplicate && (
-                  <Button variant="ghost" size="icon" onClick={handleDuplicate(q.id)}>
+                  <Button
+                    variant="ghost"
+                    size="icon"
+                    className="h-8 w-8 sm:h-9 sm:w-9"
+                    onClick={handleDuplicate(q.id)}
+                  >
                     <Copy className="h-4 w-4" />
                   </Button>
                 )}
-                <Button variant="ghost" size="icon" onClick={handleEdit(q)}>
+                <Button
+                  variant="ghost"
+                  size="icon"
+                  className="h-8 w-8 sm:h-9 sm:w-9"
+                  onClick={handleEdit(q)}
+                >
                   <Pencil className="h-4 w-4" />
                 </Button>
                 <DeleteDialog
                   title="Delete question?"
                   onConfirm={handleDelete(q.id)}
                   disabled={isDeleting === q.id}
+                  trigger={
+                    <Button
+                      variant="ghost"
+                      size="icon"
+                      className="h-8 w-8 sm:h-9 sm:w-9"
+                      disabled={isDeleting === q.id}
+                    >
+                      <span className="sr-only">Delete question</span>
+                      <Trash2 className="h-4 w-4 text-destructive" />
+                    </Button>
+                  }
                 />
               </div>
             </div>
