@@ -32,10 +32,10 @@ function NavLink({
       href={href}
       title={collapsed ? label : undefined}
       className={cn(
-        "flex items-center gap-3 rounded-lg px-3 py-2 text-sm font-medium transition-colors",
+        "flex items-center gap-3 border-l-2 px-3 py-2 text-sm font-medium transition-colors",
         isActive
-          ? "bg-primary text-primary-foreground"
-          : "text-muted-foreground hover:bg-accent hover:text-accent-foreground",
+          ? "border-primary text-foreground"
+          : "border-transparent text-muted-foreground hover:bg-accent hover:text-accent-foreground",
         collapsed && "justify-center px-2"
       )}
     >

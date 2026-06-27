@@ -85,8 +85,16 @@ export async function getTopicsBySubject(subjectId: string) {
   });
 }
 
+export async function getTopics() {
+  return prisma.topic.findMany({
+    orderBy: { name: "asc" },
+    select: { id: true, name: true, subjectId: true },
+  });
+}
+
 export async function getQuizQuestions(params: {
   subjectId?: string;
+  topicId?: string;
   difficulty?: Difficulty;
   limit?: number | "all";
   type?: "quiz" | "short_answer";
@@ -94,6 +102,7 @@ export async function getQuizQuestions(params: {
   const where: Prisma.QuestionWhereInput = {
     type: params.type ?? "quiz",
     ...(params.subjectId && { subjectId: params.subjectId }),
+    ...(params.topicId && { topicId: params.topicId }),
     ...(params.difficulty && { difficulty: params.difficulty }),
   };
 

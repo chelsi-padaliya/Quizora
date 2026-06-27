@@ -2,7 +2,8 @@
 
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { Brain, BookOpen, LogOut, Menu, User, ListChecks } from "lucide-react";
+import { Brain, BookOpen, LogOut, Menu, Moon, Sun, User } from "lucide-react";
+import { useTheme } from "next-themes";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 import {
@@ -16,9 +17,8 @@ import {
 import { SearchBar } from "@/components/SearchBar";
 import { APP_NAME, ROUTES } from "@/constants";
 import { logoutAction } from "@/actions/question.actions";
-import { useCallback, useState, useTransition } from "react";
+import { useCallback, useEffect, useState, useTransition } from "react";
 import { useDebounce } from "@/hooks/use-debounce";
-import { useEffect } from "react";
 
 interface NavbarProps {
   user?: { name?: string | null; email?: string | null };
@@ -26,11 +26,17 @@ interface NavbarProps {
   onMenuClick?: () => void;
 }
 
-export function Navbar({ user, isAdmin, onMenuClick }: NavbarProps) {
+export function Navbar({ user, onMenuClick }: NavbarProps) {
   const router = useRouter();
+  const { resolvedTheme, setTheme } = useTheme();
   const [search, setSearch] = useState("");
+  const [mounted, setMounted] = useState(false);
   const debouncedSearch = useDebounce(search, 300);
   const [, startTransition] = useTransition();
+
+  useEffect(() => {
+    setMounted(true);
+  }, []);
 
   useEffect(() => {
     if (debouncedSearch.trim().length >= 2) {
@@ -76,22 +82,19 @@ export function Navbar({ user, isAdmin, onMenuClick }: NavbarProps) {
         </div>
 
         <div className="ml-auto flex items-center gap-2">
-          {isAdmin && (
-            <>
-              <Button variant="outline" size="sm" asChild className="hidden sm:flex">
-                <Link href={ROUTES.quizQuestions}>
-                  <Brain className="mr-1 h-4 w-4" />
-                  Quiz
-                </Link>
-              </Button>
-              <Button variant="outline" size="sm" asChild className="hidden sm:flex">
-                <Link href={ROUTES.questions}>
-                  <ListChecks className="mr-1 h-4 w-4" />
-                  Questions
-                </Link>
-              </Button>
-            </>
-          )}
+          <Button
+            variant="ghost"
+            size="icon"
+            className="h-9 w-9"
+            aria-label="Toggle dark mode"
+            onClick={() => setTheme(resolvedTheme === "dark" ? "light" : "dark")}
+          >
+            {mounted && resolvedTheme === "dark" ? (
+              <Sun className="h-5 w-5" />
+            ) : (
+              <Moon className="h-5 w-5" />
+            )}
+          </Button>
 
           <DropdownMenu>
             <DropdownMenuTrigger asChild>

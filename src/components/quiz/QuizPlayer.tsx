@@ -2,7 +2,7 @@
 
 import { useCallback, useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
-import { Clock, ChevronLeft, ChevronRight, Send } from "lucide-react";
+import { CheckCircle2, ChevronLeft, ChevronRight, Send, XCircle } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Label } from "@/components/ui/label";
@@ -15,38 +15,39 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { Switch } from "@/components/ui/switch";
 import { submitQuiz } from "@/actions/question.actions";
 import { QUESTION_LIMITS } from "@/constants";
 import { FilterPanel } from "@/components/FilterPanel";
+import { cn } from "@/lib/utils";
 import type { QuizQuestion } from "@/types";
 
 interface QuizPlayerProps {
   subjects: { id: string; name: string; slug: string }[];
+  topics: { id: string; name: string; subjectId: string }[];
   initialQuestions?: QuizQuestion[];
   initialSubjectId?: string;
 }
 
-export function QuizPlayer({ subjects, initialQuestions, initialSubjectId }: QuizPlayerProps) {
+export function QuizPlayer({ subjects, topics, initialQuestions, initialSubjectId }: QuizPlayerProps) {
   const router = useRouter();
   const [phase, setPhase] = useState<"config" | "quiz" | "submitting">(
     initialQuestions?.length ? "quiz" : "config"
   );
   const [subjectId, setSubjectId] = useState(initialSubjectId ?? "all");
+  const [topicId, setTopicId] = useState("all");
   const [difficulty, setDifficulty] = useState<string>("all");
   const [limit, setLimit] = useState<string>("10");
-  const [timerEnabled, setTimerEnabled] = useState(false);
-  const [timerMinutes, setTimerMinutes] = useState(30);
   const [questions, setQuestions] = useState<QuizQuestion[]>(initialQuestions ?? []);
   const [currentIndex, setCurrentIndex] = useState(0);
   const [answers, setAnswers] = useState<
     Record<string, { selected: string | null; skipped: boolean }>
   >({});
-  const [timeLeft, setTimeLeft] = useState<number | null>(null);
   const [loading, setLoading] = useState(false);
 
   const currentQuestion = questions[currentIndex];
   const progress = questions.length > 0 ? ((currentIndex + 1) / questions.length) * 100 : 0;
+  const filteredTopics =
+    subjectId === "all" ? [] : topics.filter((topic) => topic.subjectId === subjectId);
 
   const handleSubmit = useCallback(async () => {
     setPhase("submitting");
@@ -66,20 +67,23 @@ export function QuizPlayer({ subjects, initialQuestions, initialSubjectId }: Qui
   }, [answers, questions, router, subjectId]);
 
   useEffect(() => {
-    if (!timerEnabled || timeLeft === null || phase !== "quiz") return;
-    if (timeLeft <= 0) {
-      void handleSubmit();
+    if (subjectId === "all") {
+      setTopicId("all");
       return;
     }
-    const timer = setInterval(() => setTimeLeft((t) => (t !== null ? t - 1 : null)), 1000);
-    return () => clearInterval(timer);
-  }, [timerEnabled, timeLeft, phase, handleSubmit]);
+    if (topicId === "all") return;
+    const selectedTopic = topics.find((topic) => topic.id === topicId);
+    if (selectedTopic && selectedTopic.subjectId !== subjectId) {
+      setTopicId("all");
+    }
+  }, [subjectId, topicId, topics]);
 
   const startQuiz = async () => {
     setLoading(true);
     try {
       const params = new URLSearchParams();
       if (subjectId !== "all") params.set("subjectId", subjectId);
+      if (topicId !== "all") params.set("topicId", topicId);
       if (difficulty !== "all") params.set("difficulty", difficulty);
       params.set("limit", limit);
 
@@ -94,7 +98,6 @@ export function QuizPlayer({ subjects, initialQuestions, initialSubjectId }: Qui
       setQuestions(data.questions);
       setAnswers({});
       setCurrentIndex(0);
-      if (timerEnabled) setTimeLeft(timerMinutes * 60);
       setPhase("quiz");
     } finally {
       setLoading(false);
@@ -107,12 +110,6 @@ export function QuizPlayer({ subjects, initialQuestions, initialSubjectId }: Qui
       ...prev,
       [currentQuestion.id]: { selected: value, skipped: false },
     }));
-  };
-
-  const formatTime = (seconds: number) => {
-    const m = Math.floor(seconds / 60);
-    const s = seconds % 60;
-    return `${m}:${s.toString().padStart(2, "0")}`;
   };
 
   if (phase === "config") {
@@ -146,27 +143,20 @@ export function QuizPlayer({ subjects, initialQuestions, initialSubjectId }: Qui
               </Select>
             </div>
             <div className="space-y-2">
-              <Label>Timer (optional)</Label>
-              <div className="flex flex-wrap items-center gap-4">
-                <Switch checked={timerEnabled} onCheckedChange={setTimerEnabled} />
-                {timerEnabled && (
-                  <Select
-                    value={String(timerMinutes)}
-                    onValueChange={(v) => setTimerMinutes(Number(v))}
-                  >
-                    <SelectTrigger className="w-32">
-                      <SelectValue />
-                    </SelectTrigger>
-                    <SelectContent>
-                      {[15, 30, 45, 60, 90].map((m) => (
-                        <SelectItem key={m} value={String(m)}>
-                          {m} min
-                        </SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
-                )}
-              </div>
+              <Label>Topic</Label>
+              <Select value={topicId} onValueChange={setTopicId} disabled={subjectId === "all"}>
+                <SelectTrigger>
+                  <SelectValue placeholder={subjectId === "all" ? "Select a subject first" : "All topics"} />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="all">All Topics</SelectItem>
+                  {filteredTopics.map((topic) => (
+                    <SelectItem key={topic.id} value={topic.id}>
+                      {topic.name}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
             </div>
           </div>
           <Button onClick={startQuiz} disabled={loading} className="w-full sm:w-auto">
@@ -191,6 +181,9 @@ export function QuizPlayer({ subjects, initialQuestions, initialSubjectId }: Qui
     { key: "C", value: currentQuestion.optionC },
     { key: "D", value: currentQuestion.optionD },
   ].filter((o) => o.value);
+  const selectedAnswer = answers[currentQuestion.id]?.selected ?? "";
+  const correctAnswer = currentQuestion.correctAnswer?.trim().toUpperCase() ?? "";
+  const hasAnswered = selectedAnswer.length > 0;
 
   return (
     <div className="space-y-4">
@@ -198,12 +191,6 @@ export function QuizPlayer({ subjects, initialQuestions, initialSubjectId }: Qui
         <span className="text-sm text-muted-foreground">
           Question {currentIndex + 1} of {questions.length}
         </span>
-        {timerEnabled && timeLeft !== null && (
-          <span className="flex items-center gap-1 text-sm font-medium">
-            <Clock className="h-4 w-4" />
-            {formatTime(timeLeft)}
-          </span>
-        )}
       </div>
       <Progress value={progress} />
 
@@ -218,21 +205,49 @@ export function QuizPlayer({ subjects, initialQuestions, initialSubjectId }: Qui
         </CardHeader>
         <CardContent>
           <RadioGroup
-            value={answers[currentQuestion.id]?.selected ?? ""}
+            value={selectedAnswer}
             onValueChange={handleAnswer}
             className="space-y-3"
           >
-            {options.map((option) => (
-              <label
-                key={option.key}
-                className="flex cursor-pointer items-start gap-3 rounded-lg border p-3 transition-colors hover:bg-accent sm:items-center sm:p-4"
-              >
-                <RadioGroupItem value={option.key} className="mt-0.5 sm:mt-0" />
-                <span className="min-w-0 break-words">
-                  <span className="font-medium">{option.key}.</span> {option.value}
-                </span>
-              </label>
-            ))}
+            {options.map((option) => {
+              const optionKey = option.key.toUpperCase();
+              const isCorrectOption = hasAnswered && optionKey === correctAnswer;
+              const isWrongSelection =
+                hasAnswered && selectedAnswer.toUpperCase() === optionKey && optionKey !== correctAnswer;
+
+              return (
+                <label
+                  key={option.key}
+                  className={cn(
+                    "flex cursor-pointer items-start gap-3 rounded-lg border p-3 transition-colors sm:items-center sm:p-4",
+                    !isCorrectOption && !isWrongSelection && "hover:bg-accent",
+                    selectedAnswer === option.key && !isCorrectOption && !isWrongSelection && "border-primary bg-accent",
+                    isCorrectOption &&
+                      "border-green-500 bg-green-50 text-green-900 hover:bg-green-50 dark:border-green-500/70 dark:bg-green-950/30 dark:text-green-100",
+                    isWrongSelection &&
+                      "border-red-500 bg-red-50 text-red-900 hover:bg-red-50 dark:border-red-500/70 dark:bg-red-950/30 dark:text-red-100"
+                  )}
+                >
+                  <RadioGroupItem
+                    value={option.key}
+                    className={cn(
+                      "mt-0.5 sm:mt-0",
+                      isCorrectOption && "border-green-600 text-green-600",
+                      isWrongSelection && "border-red-600 text-red-600"
+                    )}
+                  />
+                  <span className="min-w-0 flex-1 break-words">
+                    <span className="font-medium">{option.key}.</span> {option.value}
+                  </span>
+                  {isCorrectOption && (
+                    <CheckCircle2 className="h-5 w-5 shrink-0 text-green-600" aria-label="Correct answer" />
+                  )}
+                  {isWrongSelection && (
+                    <XCircle className="h-5 w-5 shrink-0 text-red-600" aria-label="Wrong answer" />
+                  )}
+                </label>
+              );
+            })}
           </RadioGroup>
         </CardContent>
       </Card>

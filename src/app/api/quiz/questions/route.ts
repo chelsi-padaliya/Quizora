@@ -11,6 +11,7 @@ export async function GET(request: NextRequest) {
 
   const { searchParams } = request.nextUrl;
   const subjectId = searchParams.get("subjectId") ?? undefined;
+  const topicId = searchParams.get("topicId") ?? undefined;
   const difficulty = searchParams.get("difficulty") as Difficulty | null;
   const limitParam = searchParams.get("limit") ?? "10";
   const limit = limitParam === "all" ? "all" : Number(limitParam);
@@ -19,6 +20,7 @@ export async function GET(request: NextRequest) {
 
   const questions = await getQuizQuestions({
     subjectId,
+    topicId,
     difficulty: difficulty ?? undefined,
     limit: limit as number | "all",
     type,

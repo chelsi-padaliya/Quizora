@@ -1,5 +1,5 @@
 import { ShortAnswerPlayer } from "@/components/short-answer/ShortAnswerPlayer";
-import { getSubjects } from "@/services/question.service";
+import { getSubjects, getTopics } from "@/services/question.service";
 
 interface ShortAnswerPageProps {
   searchParams: Promise<{ subjectId?: string }>;
@@ -7,7 +7,7 @@ interface ShortAnswerPageProps {
 
 export default async function ShortAnswerPage({ searchParams }: ShortAnswerPageProps) {
   const params = await searchParams;
-  const subjects = await getSubjects();
+  const [subjects, topics] = await Promise.all([getSubjects(), getTopics()]);
 
   return (
     <div className="mx-auto max-w-3xl space-y-6">
@@ -17,7 +17,7 @@ export default async function ShortAnswerPage({ searchParams }: ShortAnswerPageP
           Type your answer and check it against the correct answer
         </p>
       </div>
-      <ShortAnswerPlayer subjects={subjects} initialSubjectId={params.subjectId} />
+      <ShortAnswerPlayer subjects={subjects} topics={topics} initialSubjectId={params.subjectId} />
     </div>
   );
 }

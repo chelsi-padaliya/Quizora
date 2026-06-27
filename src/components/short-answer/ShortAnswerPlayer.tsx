@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { CheckCircle2, XCircle, ChevronLeft, ChevronRight, RotateCcw } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -20,6 +20,7 @@ import type { QuizQuestion } from "@/types";
 
 interface ShortAnswerPlayerProps {
   subjects: { id: string; name: string; slug: string }[];
+  topics: { id: string; name: string; subjectId: string }[];
   initialSubjectId?: string;
 }
 
@@ -30,9 +31,10 @@ interface QuestionAnswer {
   state: AnswerState;
 }
 
-export function ShortAnswerPlayer({ subjects, initialSubjectId }: ShortAnswerPlayerProps) {
+export function ShortAnswerPlayer({ subjects, topics, initialSubjectId }: ShortAnswerPlayerProps) {
   const [phase, setPhase] = useState<"config" | "playing" | "done">("config");
   const [subjectId, setSubjectId] = useState(initialSubjectId ?? "all");
+  const [topicId, setTopicId] = useState("all");
   const [difficulty, setDifficulty] = useState("all");
   const [limit, setLimit] = useState("10");
   const [questions, setQuestions] = useState<QuizQuestion[]>([]);
@@ -44,12 +46,27 @@ export function ShortAnswerPlayer({ subjects, initialSubjectId }: ShortAnswerPla
   const currentQuestion = questions[currentIndex];
   const currentAnswer = currentQuestion ? answers[currentQuestion.id] : undefined;
   const progress = questions.length > 0 ? ((currentIndex + 1) / questions.length) * 100 : 0;
+  const filteredTopics =
+    subjectId === "all" ? [] : topics.filter((topic) => topic.subjectId === subjectId);
+
+  useEffect(() => {
+    if (subjectId === "all") {
+      setTopicId("all");
+      return;
+    }
+    if (topicId === "all") return;
+    const selectedTopic = topics.find((topic) => topic.id === topicId);
+    if (selectedTopic && selectedTopic.subjectId !== subjectId) {
+      setTopicId("all");
+    }
+  }, [subjectId, topicId, topics]);
 
   const startSession = async () => {
     setLoading(true);
     try {
       const params = new URLSearchParams();
       if (subjectId !== "all") params.set("subjectId", subjectId);
+      if (topicId !== "all") params.set("topicId", topicId);
       if (difficulty !== "all") params.set("difficulty", difficulty);
       params.set("limit", limit);
       params.set("type", "short_answer");
@@ -122,20 +139,38 @@ export function ShortAnswerPlayer({ subjects, initialSubjectId }: ShortAnswerPla
             onDifficultyChange={setDifficulty}
             subjects={subjects}
           />
-          <div className="space-y-2">
-            <Label>Question Limit</Label>
-            <Select value={limit} onValueChange={setLimit}>
-              <SelectTrigger className="w-full sm:w-40">
-                <SelectValue />
-              </SelectTrigger>
-              <SelectContent>
-                {QUESTION_LIMITS.map((l) => (
-                  <SelectItem key={String(l)} value={String(l)}>
-                    {l === "all" ? "All" : l}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
+          <div className="grid gap-4 sm:grid-cols-2">
+            <div className="space-y-2">
+              <Label>Question Limit</Label>
+              <Select value={limit} onValueChange={setLimit}>
+                <SelectTrigger>
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  {QUESTION_LIMITS.map((l) => (
+                    <SelectItem key={String(l)} value={String(l)}>
+                      {l === "all" ? "All" : l}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+            <div className="space-y-2">
+              <Label>Topic</Label>
+              <Select value={topicId} onValueChange={setTopicId} disabled={subjectId === "all"}>
+                <SelectTrigger>
+                  <SelectValue placeholder={subjectId === "all" ? "Select a subject first" : "All topics"} />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="all">All Topics</SelectItem>
+                  {filteredTopics.map((topic) => (
+                    <SelectItem key={topic.id} value={topic.id}>
+                      {topic.name}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
           </div>
           <Button onClick={startSession} disabled={loading} className="w-full sm:w-auto">
             {loading ? "Loading..." : "Start Session"}
