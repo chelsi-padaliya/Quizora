@@ -7,6 +7,7 @@ import { Loader2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { Textarea } from "@/components/ui/textarea";
 import {
   Select,
@@ -25,6 +26,8 @@ interface QuestionFormProps {
   topics: { id: string; name: string; subjectId: string }[];
   question?: Question & { subject: { id: string; name: string } | null; topic: { id: string; name: string } | null };
   fixedType?: "quiz" | "theory" | "short_answer";
+  defaultSubjectId?: string;
+  defaultDifficulty?: string;
   onSuccess?: () => void;
   onCancel?: () => void;
 }
@@ -34,6 +37,8 @@ export function QuestionForm({
   topics,
   question,
   fixedType,
+  defaultSubjectId,
+  defaultDifficulty,
   onSuccess,
   onCancel,
 }: QuestionFormProps) {
@@ -64,7 +69,8 @@ export function QuestionForm({
         }
       : {
           type: fixedType ?? "quiz",
-          difficulty: "beginner" as const,
+          difficulty: (defaultDifficulty ?? "beginner") as "beginner" | "intermediate" | "advanced",
+          subjectId: defaultSubjectId,
         },
   });
 
@@ -179,21 +185,27 @@ export function QuestionForm({
           </div>
           <div className="space-y-2">
             <Label>Correct Answer</Label>
-            <Select
+            <RadioGroup
               value={watch("correctAnswer") ?? ""}
-              onValueChange={(v) => setValue("correctAnswer", v)}
+              onValueChange={(v) =>
+                setValue("correctAnswer", v, { shouldDirty: true, shouldValidate: true })
+              }
+              className="grid grid-cols-2 gap-3 sm:flex sm:flex-wrap"
             >
-              <SelectTrigger className="w-32">
-                <SelectValue placeholder="Select" />
-              </SelectTrigger>
-              <SelectContent>
-                {["A", "B", "C", "D"].map((opt) => (
-                  <SelectItem key={opt} value={opt}>
-                    {opt}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
+              {["A", "B", "C", "D"].map((opt) => (
+                <Label
+                  key={opt}
+                  htmlFor={`correct-answer-${opt}`}
+                  className="flex h-11 min-w-24 cursor-pointer items-center gap-2 rounded-md border border-input px-3 text-sm font-medium hover:bg-accent hover:text-accent-foreground has-[[data-state=checked]]:border-primary has-[[data-state=checked]]:bg-primary/10"
+                >
+                  <RadioGroupItem id={`correct-answer-${opt}`} value={opt} />
+                  Option {opt}
+                </Label>
+              ))}
+            </RadioGroup>
+            {errors.correctAnswer && (
+              <p className="text-sm text-destructive">{errors.correctAnswer.message}</p>
+            )}
           </div>
           <div className="space-y-2">
             <Label>Explanation</Label>

@@ -188,6 +188,8 @@ export function QuestionManagerClient({
               <FormComponent
                 subjects={subjects}
                 topics={topics}
+                defaultSubjectId={subjectFilter}
+                defaultDifficulty={difficultyFilter}
                 onSuccess={() => {
                   setCreateOpen(false);
                   startTransition(() => router.refresh());

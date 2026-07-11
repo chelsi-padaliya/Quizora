@@ -10,6 +10,8 @@ interface QuizFormProps {
     subject: { id: string; name: string } | null;
     topic: { id: string; name: string } | null;
   };
+  defaultSubjectId?: string;
+  defaultDifficulty?: string;
   onSuccess?: () => void;
   onCancel?: () => void;
 }
