@@ -27,6 +27,7 @@ const TopicForm = dynamic(
 interface TopicManagerClientProps {
   topics: TopicRow[];
   subjects: { id: string; name: string }[];
+  technologies?: { id: string; name: string }[];
   page: number;
   totalPages: number;
   total: number;
@@ -35,6 +36,7 @@ interface TopicManagerClientProps {
 export function TopicManagerClient({
   topics: initialTopics,
   subjects,
+  technologies = [],
   page,
   totalPages,
   total,
@@ -53,6 +55,7 @@ export function TopicManagerClient({
   const debouncedSearch = useDebounce(search, 300);
 
   const subjectFilter = searchParams.get("subjectId") ?? undefined;
+  const technologyFilter = searchParams.get("technologyId") ?? undefined;
 
   const updateParams = useCallback(
     (updates: Record<string, string | undefined>) => {
@@ -107,6 +110,13 @@ export function TopicManagerClient({
             onChange={setSearch}
             placeholder="Search topics..."
             className="w-full min-w-0 flex-1 sm:min-w-[200px]"
+          />
+          <FilterDropdown
+            value={technologyFilter}
+            onChange={(v) => updateParams({ technologyId: v, subjectId: undefined, page: "1" })}
+            options={technologies.map((technology) => ({ value: technology.id, label: technology.name }))}
+            placeholder="Technology"
+            allLabel="All Technologies"
           />
           <FilterDropdown
             value={subjectFilter}

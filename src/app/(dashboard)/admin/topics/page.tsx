@@ -2,6 +2,7 @@ import { Suspense } from "react";
 import dynamic from "next/dynamic";
 import { requireAdmin } from "@/lib/auth-utils";
 import { fetchAdminTopics, getCachedSubjects } from "@/lib/admin-utils";
+import { getTechnologies } from "@/services/question.service";
 import { TopicTableSkeleton } from "@/components/shared/TopicTable";
 
 const TopicManagerClient = dynamic(
@@ -11,16 +12,17 @@ const TopicManagerClient = dynamic(
 );
 
 interface AdminTopicsPageProps {
-  searchParams: Promise<{ page?: string; search?: string; subjectId?: string }>;
+  searchParams: Promise<{ page?: string; search?: string; subjectId?: string; technologyId?: string }>;
 }
 
 export default async function AdminTopicsPage({ searchParams }: AdminTopicsPageProps) {
   await requireAdmin();
   const params = await searchParams;
 
-  const [result, subjects] = await Promise.all([
+  const [result, subjects, technologies] = await Promise.all([
     fetchAdminTopics(params),
     getCachedSubjects(),
+    getTechnologies(),
   ]);
 
   return (
@@ -32,7 +34,8 @@ export default async function AdminTopicsPage({ searchParams }: AdminTopicsPageP
       <Suspense fallback={<TopicTableSkeleton />}>
         <TopicManagerClient
           topics={result.data}
-          subjects={subjects}
+          subjects={subjects.filter((subject) => !params.technologyId || subject.technology?.id === params.technologyId)}
+          technologies={technologies}
           page={result.page}
           totalPages={result.totalPages}
           total={result.total}

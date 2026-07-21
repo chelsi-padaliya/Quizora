@@ -10,26 +10,30 @@ import { createSubject, updateSubject } from "@/actions/subject.actions";
 import { subjectSchema, type SubjectInput } from "@/validations";
 import { slugify } from "@/lib/utils";
 import { useState } from "react";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 
 interface SubjectFormProps {
-  subject?: { id: string; name: string; slug: string };
+  subject?: { id: string; name: string; slug: string; technologyId: string };
+  technologies: { id: string; name: string }[];
+  defaultTechnologyId?: string;
   onSuccess?: () => void;
   onCancel?: () => void;
 }
 
-export function SubjectForm({ subject, onSuccess, onCancel }: SubjectFormProps) {
+export function SubjectForm({ subject, technologies, defaultTechnologyId, onSuccess, onCancel }: SubjectFormProps) {
   const [error, setError] = useState<string | null>(null);
 
   const {
     register,
     handleSubmit,
     watch,
+    setValue,
     formState: { errors, isSubmitting },
   } = useForm<SubjectInput>({
     resolver: zodResolver(subjectSchema),
     defaultValues: subject
-      ? { name: subject.name, slug: subject.slug }
-      : { name: "", slug: "" },
+      ? { name: subject.name, slug: subject.slug, technologyId: subject.technologyId }
+      : { name: "", slug: "", technologyId: defaultTechnologyId ?? "" },
   });
 
   const name = watch("name");
@@ -53,6 +57,14 @@ export function SubjectForm({ subject, onSuccess, onCancel }: SubjectFormProps) 
       {error && (
         <div className="rounded-md bg-destructive/10 p-3 text-sm text-destructive">{error}</div>
       )}
+      <div className="space-y-2">
+        <Label>Technology</Label>
+        <Select value={watch("technologyId")} onValueChange={(value) => setValue("technologyId", value)}>
+          <SelectTrigger><SelectValue placeholder="Select technology" /></SelectTrigger>
+          <SelectContent>{technologies.map((technology) => <SelectItem key={technology.id} value={technology.id}>{technology.name}</SelectItem>)}</SelectContent>
+        </Select>
+        {errors.technologyId && <p className="text-sm text-destructive">{errors.technologyId.message}</p>}
+      </div>
       <div className="space-y-2">
         <Label>Name</Label>
         <Input {...register("name")} placeholder="JavaScript" />

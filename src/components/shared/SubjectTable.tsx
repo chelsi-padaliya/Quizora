@@ -12,6 +12,8 @@ export type SubjectRow = {
   id: string;
   name: string;
   slug: string;
+  technologyId: string;
+  technology: { id: string; name: string };
   _count?: { questions: number; topics: number };
 };
 
@@ -38,7 +40,8 @@ function SubjectTableComponent({ subjects, onEdit, onDelete, isDeleting }: Subje
             <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between sm:gap-4">
               <div className="min-w-0 flex-1">
                 <div className="mb-2 flex flex-wrap gap-2">
-                  <Badge variant="secondary">{s.slug}</Badge>
+                  <Badge variant="secondary">{s.technology.name}</Badge>
+                  <Badge variant="outline">{s.slug}</Badge>
                   {s._count && (
                     <>
                       <Badge variant="outline">{s._count.topics} topics</Badge>

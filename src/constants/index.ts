@@ -40,6 +40,7 @@ export const ROUTES = {
   quizQuestions: "/admin/quiz-questions",
   theoryQuestions: "/admin/theory-questions",
   subjects: "/admin/subjects",
+  technologies: "/admin/technologies",
   topics: "/admin/topics",
   quizResults: "/quiz/results",
   shortAnswer: "/short-answer",

@@ -11,11 +11,12 @@ export async function GET(request: NextRequest) {
 
   const { searchParams } = request.nextUrl;
   const subjectId = searchParams.get("subjectId") ?? undefined;
+  const topicId = searchParams.get("topicId") ?? undefined;
   const difficulty = (searchParams.get("difficulty") ?? undefined) as Difficulty | undefined;
   const search = searchParams.get("search") ?? undefined;
   const page = Number(searchParams.get("page") ?? "1");
 
-  const result = await getTheoryQuestions({ subjectId, difficulty, search, page });
+  const result = await getTheoryQuestions({ subjectId, topicId, difficulty, search, page });
 
   return NextResponse.json(result);
 }

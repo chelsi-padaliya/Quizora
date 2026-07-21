@@ -1,10 +1,10 @@
 import { Suspense } from "react";
 import { TheoryPageClient } from "@/components/theory/TheoryPageClient";
 import { Skeleton } from "@/components/ui/skeleton";
-import { getSubjects } from "@/services/question.service";
+import { getSubjects, getTopics } from "@/services/question.service";
 
 export default async function TheoryPage() {
-  const subjects = await getSubjects();
+  const [subjects, topics] = await Promise.all([getSubjects(), getTopics()]);
 
   return (
     <div className="space-y-6">
@@ -15,7 +15,7 @@ export default async function TheoryPage() {
         </p>
       </div>
       <Suspense fallback={<Skeleton className="h-64 w-full" />}>
-        <TheoryPageClient subjects={subjects} />
+        <TheoryPageClient subjects={subjects} topics={topics} />
       </Suspense>
     </div>
   );

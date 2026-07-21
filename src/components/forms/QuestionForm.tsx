@@ -22,7 +22,7 @@ import { questionSchema, type QuestionInput } from "@/validations";
 import type { Question } from "@/types";
 
 interface QuestionFormProps {
-  subjects: { id: string; name: string }[];
+  subjects: { id: string; name: string; technology?: { id: string; name: string } }[];
   topics: { id: string; name: string; subjectId: string }[];
   question?: Question & { subject: { id: string; name: string } | null; topic: { id: string; name: string } | null };
   fixedType?: "quiz" | "theory" | "short_answer";
@@ -75,8 +75,11 @@ export function QuestionForm({
   });
 
   const subjectId = watch("subjectId") ?? "";
+  const [technologyId, setTechnologyId] = useState(() => subjects.find((s) => s.id === (question?.subjectId ?? defaultSubjectId))?.technology?.id ?? "");
   const questionType = fixedType ?? watch("type");
-  const filteredTopics = topics.filter((t) => t.subjectId === (subjectId ?? ""));
+  const filteredSubjects = technologyId ? subjects.filter((s) => s.technology?.id === technologyId) : [];
+  const filteredTopics = topics.filter((t) => t.subjectId === subjectId);
+  const technologies = Array.from(new Map(subjects.filter((s) => s.technology).map((s) => [s.technology!.id, s.technology!])).values());
 
 
   const onSubmit = async (data: QuestionInput) => {
@@ -101,6 +104,13 @@ export function QuestionForm({
 
       <div className="grid gap-4 sm:grid-cols-2">
         <div className="space-y-2">
+          <Label>Technology</Label>
+          <Select value={technologyId} onValueChange={(v) => { setTechnologyId(v); setValue("subjectId", undefined); setValue("topicId", undefined); }}>
+            <SelectTrigger><SelectValue placeholder="Select technology" /></SelectTrigger>
+            <SelectContent>{technologies.map((t) => <SelectItem key={t.id} value={t.id}>{t.name}</SelectItem>)}</SelectContent>
+          </Select>
+        </div>
+        <div className="space-y-2">
           <Label>Subject</Label>
           <Select
             value={subjectId}
@@ -110,7 +120,7 @@ export function QuestionForm({
               <SelectValue placeholder="Select subject" />
             </SelectTrigger>
             <SelectContent>
-              {subjects.map((s) => (
+              {filteredSubjects.map((s) => (
                 <SelectItem key={s.id} value={s.id}>
                   {s.name}
                 </SelectItem>
@@ -144,7 +154,7 @@ export function QuestionForm({
         </div>
       </div>
 
-      {filteredTopics.length > 0 && (
+      {technologyId && subjectId && (
         <div className="space-y-2">
           <Label>Topic (optional)</Label>
           <Select

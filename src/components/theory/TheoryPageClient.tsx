@@ -7,14 +7,17 @@ import { SearchBar } from "@/components/SearchBar";
 import { Pagination } from "@/components/Pagination";
 import { TheoryCard } from "@/components/theory/TheoryCard";
 import { Skeleton } from "@/components/ui/skeleton";
+import { Label } from "@/components/ui/label";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { useDebounce } from "@/hooks/use-debounce";
 import type { TheoryQuestionItem } from "@/types";
 
 interface TheoryPageClientProps {
-  subjects: { id: string; name: string; slug: string }[];
+  subjects: { id: string; name: string; slug: string; technology?: { id: string; name: string } }[];
+  topics: { id: string; name: string; subjectId: string }[];
 }
 
-export function TheoryPageClient({ subjects }: TheoryPageClientProps) {
+export function TheoryPageClient({ subjects, topics }: TheoryPageClientProps) {
   const router = useRouter();
   const searchParams = useSearchParams();
   const [questions, setQuestions] = useState<TheoryQuestionItem[]>([]);
@@ -25,6 +28,9 @@ export function TheoryPageClient({ subjects }: TheoryPageClientProps) {
   const page = Number(searchParams.get("page") ?? "1");
   const subjectId = searchParams.get("subjectId") ?? "all";
   const difficulty = searchParams.get("difficulty") ?? "all";
+  const technologyId = searchParams.get("technologyId") ?? "all";
+  const topicId = searchParams.get("topicId") ?? "all";
+  const filteredTopics = subjectId === "all" ? [] : topics.filter((topic) => topic.subjectId === subjectId);
   const debouncedSearch = useDebounce(searchInput, 300);
 
   const updateParams = useCallback(
@@ -55,6 +61,7 @@ export function TheoryPageClient({ subjects }: TheoryPageClientProps) {
       const params = new URLSearchParams();
       params.set("page", String(page));
       if (subjectId !== "all") params.set("subjectId", subjectId);
+      if (topicId !== "all") params.set("topicId", topicId);
       if (difficulty !== "all") params.set("difficulty", difficulty);
       const search = searchParams.get("search");
       if (search) params.set("search", search);
@@ -66,7 +73,7 @@ export function TheoryPageClient({ subjects }: TheoryPageClientProps) {
     } finally {
       setLoading(false);
     }
-  }, [page, subjectId, difficulty, searchParams]);
+  }, [page, subjectId, topicId, difficulty, searchParams]);
 
   useEffect(() => {
     fetchQuestions();
@@ -82,11 +89,14 @@ export function TheoryPageClient({ subjects }: TheoryPageClientProps) {
 
       <FilterPanel
         subjectId={subjectId}
-        onSubjectChange={(v) => updateParams({ subjectId: v, page: "1" })}
+        onSubjectChange={(v) => updateParams({ subjectId: v, topicId: "all", page: "1" })}
+        technologyId={technologyId}
+        onTechnologyChange={(v) => updateParams({ technologyId: v, subjectId: "all", topicId: "all", page: "1" })}
         difficulty={difficulty}
         onDifficultyChange={(v) => updateParams({ difficulty: v, page: "1" })}
         subjects={subjects}
       />
+      <div className="max-w-sm space-y-2"><Label>Topic</Label><Select value={topicId} onValueChange={(value) => updateParams({ topicId: value, page: "1" })} disabled={subjectId === "all"}><SelectTrigger><SelectValue placeholder={subjectId === "all" ? "Select a subject first" : "All topics"} /></SelectTrigger><SelectContent><SelectItem value="all">All Topics</SelectItem>{filteredTopics.map((topic) => <SelectItem key={topic.id} value={topic.id}>{topic.name}</SelectItem>)}</SelectContent></Select></div>
 
       {loading ? (
         <div className="space-y-3">

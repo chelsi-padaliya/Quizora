@@ -4,6 +4,7 @@ import type { PaginatedResult } from "@/types";
 
 export async function getTopicsPaginated(params: {
   subjectId?: string;
+  technologyId?: string;
   search?: string;
   page?: number;
   limit?: number;
@@ -14,6 +15,7 @@ export async function getTopicsPaginated(params: {
 
   const where = {
     ...(params.subjectId && { subjectId: params.subjectId }),
+    ...(params.technologyId && { subject: { technologyId: params.technologyId } }),
     ...(params.search && {
       OR: [{ name: { contains: params.search, mode: "insensitive" as const } }],
     }),

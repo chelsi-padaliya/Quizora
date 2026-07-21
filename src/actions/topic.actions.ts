@@ -2,6 +2,7 @@
 
 import { prisma } from "@/lib/prisma";
 import { requireAdmin } from "@/lib/auth-utils";
+import { slugify } from "@/lib/utils";
 import type { ActionResult } from "@/types";
 import { topicSchema, type TopicInput } from "@/validations";
 import { revalidatePath } from "next/cache";
@@ -28,7 +29,7 @@ export async function createTopic(input: TopicInput): Promise<ActionResult<{ id:
     }
 
     const topic = await prisma.topic.create({
-      data: { subjectId: parsed.data.subjectId, name: parsed.data.name },
+      data: { subjectId: parsed.data.subjectId, name: parsed.data.name, slug: slugify(parsed.data.name) },
     });
 
     revalidateAdmin();
@@ -48,7 +49,7 @@ export async function updateTopic(id: string, input: TopicInput): Promise<Action
 
     await prisma.topic.update({
       where: { id },
-      data: { subjectId: parsed.data.subjectId, name: parsed.data.name },
+      data: { subjectId: parsed.data.subjectId, name: parsed.data.name, slug: slugify(parsed.data.name) },
     });
 
     revalidateAdmin();

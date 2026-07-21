@@ -19,7 +19,7 @@ import { FilterPanel } from "@/components/FilterPanel";
 import type { QuizQuestion } from "@/types";
 
 interface ShortAnswerPlayerProps {
-  subjects: { id: string; name: string; slug: string }[];
+  subjects: { id: string; name: string; slug: string; technology?: { id: string; name: string } }[];
   topics: { id: string; name: string; subjectId: string }[];
   initialSubjectId?: string;
 }
@@ -34,6 +34,7 @@ interface QuestionAnswer {
 export function ShortAnswerPlayer({ subjects, topics, initialSubjectId }: ShortAnswerPlayerProps) {
   const [phase, setPhase] = useState<"config" | "playing" | "done">("config");
   const [subjectId, setSubjectId] = useState(initialSubjectId ?? "all");
+  const [technologyId, setTechnologyId] = useState("all");
   const [topicId, setTopicId] = useState("all");
   const [difficulty, setDifficulty] = useState("all");
   const [limit, setLimit] = useState("10");
@@ -134,7 +135,9 @@ export function ShortAnswerPlayer({ subjects, topics, initialSubjectId }: ShortA
         <CardContent className="space-y-6">
           <FilterPanel
             subjectId={subjectId}
-            onSubjectChange={setSubjectId}
+            onSubjectChange={(value) => { setSubjectId(value); setTopicId("all"); }}
+            technologyId={technologyId}
+            onTechnologyChange={(value) => { setTechnologyId(value); setSubjectId("all"); setTopicId("all"); }}
             difficulty={difficulty}
             onDifficultyChange={setDifficulty}
             subjects={subjects}

@@ -15,6 +15,7 @@ import {
 import { SubjectTable, SubjectTableSkeleton, type SubjectRow } from "@/components/shared/SubjectTable";
 import { PaginationControls } from "@/components/shared/PaginationControls";
 import { SearchBar } from "@/components/shared/SearchBar";
+import { FilterDropdown } from "@/components/shared/FilterDropdown";
 import { useDebounce } from "@/hooks/use-debounce";
 import { deleteSubject } from "@/actions/subject.actions";
 
@@ -25,6 +26,7 @@ const SubjectForm = dynamic(
 
 interface SubjectManagerClientProps {
   subjects: SubjectRow[];
+  technologies: { id: string; name: string; _count?: { subjects: number } }[];
   page: number;
   totalPages: number;
   total: number;
@@ -32,6 +34,7 @@ interface SubjectManagerClientProps {
 
 export function SubjectManagerClient({
   subjects: initialSubjects,
+  technologies,
   page,
   totalPages,
   total,
@@ -48,6 +51,8 @@ export function SubjectManagerClient({
 
   const [search, setSearch] = useState(searchParams.get("search") ?? "");
   const debouncedSearch = useDebounce(search, 300);
+  const technologyFilter = searchParams.get("technologyId") ?? undefined;
+  const selectedTechnology = technologies.find((technology) => technology.id === technologyFilter);
 
   const updateParams = useCallback(
     (updates: Record<string, string | undefined>) => {
@@ -97,11 +102,18 @@ export function SubjectManagerClient({
           placeholder="Search subjects..."
           className="w-full flex-1 sm:max-w-sm"
         />
+        <FilterDropdown
+          value={technologyFilter}
+          onChange={(value) => updateParams({ technologyId: value, page: "1" })}
+          options={technologies.map((technology) => ({ value: technology.id, label: technology.name }))}
+          placeholder="Category"
+          allLabel="All Categories"
+        />
         <Dialog open={createOpen} onOpenChange={setCreateOpen}>
           <DialogTrigger asChild>
             <Button className="w-full sm:w-auto">
               <Plus className="mr-2 h-4 w-4" />
-              Add Subject
+              {selectedTechnology ? `Add Subject to ${selectedTechnology.name}` : "Add Subject"}
             </Button>
           </DialogTrigger>
           <DialogContent>
@@ -109,6 +121,8 @@ export function SubjectManagerClient({
               <DialogTitle>Create Subject</DialogTitle>
             </DialogHeader>
             <SubjectForm
+              technologies={technologies}
+              defaultTechnologyId={technologyFilter}
               onSuccess={() => {
                 setCreateOpen(false);
                 startTransition(() => router.refresh());
@@ -149,6 +163,7 @@ export function SubjectManagerClient({
           {editSubject && (
             <SubjectForm
               subject={editSubject}
+              technologies={technologies}
               onSuccess={() => {
                 setEditSubject(null);
                 startTransition(() => router.refresh());

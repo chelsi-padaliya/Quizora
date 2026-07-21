@@ -522,13 +522,19 @@ async function main() {
 
   console.log(`Admin user: ${adminEmail}`);
 
+  const defaultTechnology = await prisma.technology.upsert({
+    where: { slug: "uncategorized" },
+    update: {},
+    create: { name: "Uncategorized", slug: "uncategorized" },
+  });
+
   const subjectMap: Record<string, string> = {};
 
   for (const subject of SUBJECTS) {
     const created = await prisma.subject.upsert({
       where: { slug: subject.slug },
-      update: { name: subject.name },
-      create: { name: subject.name, slug: subject.slug },
+      update: { name: subject.name, technologyId: defaultTechnology.id },
+      create: { name: subject.name, slug: subject.slug, technologyId: defaultTechnology.id },
     });
     subjectMap[subject.slug] = created.id;
 
@@ -539,7 +545,7 @@ async function main() {
           subjectId_name: { subjectId: created.id, name: topicName },
         },
         update: {},
-        create: { subjectId: created.id, name: topicName },
+        create: { subjectId: created.id, name: topicName, slug: topicName.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/(^-|-$)/g, "") },
       });
     }
   }

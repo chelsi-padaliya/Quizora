@@ -33,6 +33,7 @@ export const quizConfigSchema = z.object({
 });
 
 export const subjectSchema = z.object({
+  technologyId: z.string().min(1, "Technology is required"),
   name: z.string().min(2, "Name must be at least 2 characters"),
   slug: z
     .string()
@@ -47,6 +48,11 @@ export const subjectSchema = z.object({
     ),
 });
 
+export const technologySchema = z.object({
+  name: z.string().min(2, "Name must be at least 2 characters"),
+  slug: z.string().optional(),
+});
+
 export const topicSchema = z.object({
   subjectId: z.string().min(1, "Subject is required"),
   name: z.string().min(2, "Name must be at least 2 characters"),
@@ -56,4 +62,5 @@ export type LoginInput = z.infer<typeof loginSchema>;
 export type QuestionInput = z.infer<typeof questionSchema>;
 export type QuizConfigInput = z.infer<typeof quizConfigSchema>;
 export type SubjectInput = z.infer<typeof subjectSchema>;
+export type TechnologyInput = z.infer<typeof technologySchema>;
 export type TopicInput = z.infer<typeof topicSchema>;

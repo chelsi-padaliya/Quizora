@@ -3,6 +3,7 @@ import { prisma } from "@/lib/prisma";
 import type { PaginatedResult } from "@/types";
 
 export async function getSubjectsPaginated(params: {
+  technologyId?: string;
   search?: string;
   page?: number;
   limit?: number;
@@ -11,7 +12,7 @@ export async function getSubjectsPaginated(params: {
   const limit = params.limit ?? ITEMS_PER_PAGE;
   const skip = (page - 1) * limit;
 
-  const where = params.search
+  const where: { technologyId?: string; OR?: { name?: { contains: string; mode: "insensitive" }; slug?: { contains: string; mode: "insensitive" } }[] } = params.search
     ? {
         OR: [
           { name: { contains: params.search, mode: "insensitive" as const } },
@@ -19,6 +20,7 @@ export async function getSubjectsPaginated(params: {
         ],
       }
     : {};
+  if (params.technologyId) Object.assign(where, { technologyId: params.technologyId });
 
   const [data, total] = await Promise.all([
     prisma.subject.findMany({
@@ -27,6 +29,7 @@ export async function getSubjectsPaginated(params: {
       take: limit,
       orderBy: { name: "asc" },
       include: {
+        technology: { select: { id: true, name: true } },
         _count: { select: { questions: true, topics: true } },
       },
     }),

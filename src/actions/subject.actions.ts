@@ -20,6 +20,24 @@ function revalidateAdmin() {
   ADMIN_PATHS.forEach((path) => revalidatePath(path));
 }
 
+async function getSubjectConflict(name: string, slug: string, excludeId?: string) {
+  const subject = await prisma.subject.findFirst({
+    where: {
+      ...(excludeId ? { id: { not: excludeId } } : {}),
+      OR: [
+        { name: { equals: name, mode: "insensitive" } },
+        { slug },
+      ],
+    },
+    select: { name: true, slug: true },
+  });
+
+  if (!subject) return null;
+  return subject.slug === slug
+    ? `The slug "${slug}" is already in use. Use a different slug or edit the existing subject.`
+    : `The subject "${subject.name}" already exists. Edit it to change its technology instead.`;
+}
+
 export async function createSubject(input: SubjectInput): Promise<ActionResult<{ id: string }>> {
   try {
     await requireAdmin();
@@ -29,8 +47,10 @@ export async function createSubject(input: SubjectInput): Promise<ActionResult<{
     }
 
     const slug = parsed.data.slug ?? slugify(parsed.data.name);
+    const conflict = await getSubjectConflict(parsed.data.name, slug);
+    if (conflict) return { success: false, error: conflict };
     const subject = await prisma.subject.create({
-      data: { name: parsed.data.name, slug },
+      data: { name: parsed.data.name, slug, technologyId: parsed.data.technologyId },
     });
 
     revalidateAdmin();
@@ -49,9 +69,11 @@ export async function updateSubject(id: string, input: SubjectInput): Promise<Ac
     }
 
     const slug = parsed.data.slug ?? slugify(parsed.data.name);
+    const conflict = await getSubjectConflict(parsed.data.name, slug, id);
+    if (conflict) return { success: false, error: conflict };
     await prisma.subject.update({
       where: { id },
-      data: { name: parsed.data.name, slug },
+      data: { name: parsed.data.name, slug, technologyId: parsed.data.technologyId },
     });
 
     revalidateAdmin();

@@ -22,7 +22,7 @@ import { cn } from "@/lib/utils";
 import type { QuizQuestion } from "@/types";
 
 interface QuizPlayerProps {
-  subjects: { id: string; name: string; slug: string }[];
+  subjects: { id: string; name: string; slug: string; technology?: { id: string; name: string } }[];
   topics: { id: string; name: string; subjectId: string }[];
   initialQuestions?: QuizQuestion[];
   initialSubjectId?: string;
@@ -34,6 +34,7 @@ export function QuizPlayer({ subjects, topics, initialQuestions, initialSubjectI
     initialQuestions?.length ? "quiz" : "config"
   );
   const [subjectId, setSubjectId] = useState(initialSubjectId ?? "all");
+  const [technologyId, setTechnologyId] = useState("all");
   const [topicId, setTopicId] = useState("all");
   const [difficulty, setDifficulty] = useState<string>("all");
   const [limit, setLimit] = useState<string>("10");
@@ -121,7 +122,9 @@ export function QuizPlayer({ subjects, topics, initialQuestions, initialSubjectI
         <CardContent className="space-y-6">
           <FilterPanel
             subjectId={subjectId}
-            onSubjectChange={setSubjectId}
+            onSubjectChange={(value) => { setSubjectId(value); setTopicId("all"); }}
+            technologyId={technologyId}
+            onTechnologyChange={(value) => { setTechnologyId(value); setSubjectId("all"); setTopicId("all"); }}
             difficulty={difficulty}
             onDifficultyChange={setDifficulty}
             subjects={subjects}

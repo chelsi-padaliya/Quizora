@@ -62,9 +62,16 @@ export async function getRecentActivity(limit = 10): Promise<RecentActivity[]> {
 export async function getSubjects() {
   return prisma.subject.findMany({
     orderBy: { name: "asc" },
-    include: {
+    include: { technology: { select: { id: true, name: true } },
       _count: { select: { questions: true } },
     },
+  });
+}
+
+export async function getTechnologies() {
+  return prisma.technology.findMany({
+    orderBy: { name: "asc" },
+    select: { id: true, name: true, _count: { select: { subjects: true } } },
   });
 }
 
@@ -141,6 +148,7 @@ export async function getQuizQuestions(params: {
 
 export async function getTheoryQuestions(params: {
   subjectId?: string;
+  topicId?: string;
   difficulty?: Difficulty;
   search?: string;
   page?: number;
@@ -153,6 +161,7 @@ export async function getTheoryQuestions(params: {
   const where: Prisma.QuestionWhereInput = {
     type: "theory",
     ...(params.subjectId && { subjectId: params.subjectId }),
+    ...(params.topicId && { topicId: params.topicId }),
     ...(params.difficulty && { difficulty: params.difficulty }),
     ...(params.search && {
       OR: [

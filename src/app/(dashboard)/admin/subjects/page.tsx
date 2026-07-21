@@ -2,6 +2,7 @@ import { Suspense } from "react";
 import dynamic from "next/dynamic";
 import { requireAdmin } from "@/lib/auth-utils";
 import { fetchAdminSubjects } from "@/lib/admin-utils";
+import { getTechnologies } from "@/services/question.service";
 import { SubjectTableSkeleton } from "@/components/shared/SubjectTable";
 
 const SubjectManagerClient = dynamic(
@@ -13,23 +14,24 @@ const SubjectManagerClient = dynamic(
 );
 
 interface AdminSubjectsPageProps {
-  searchParams: Promise<{ page?: string; search?: string }>;
+  searchParams: Promise<{ page?: string; search?: string; technologyId?: string }>;
 }
 
 export default async function AdminSubjectsPage({ searchParams }: AdminSubjectsPageProps) {
   await requireAdmin();
   const params = await searchParams;
-  const result = await fetchAdminSubjects(params);
+  const [result, technologies] = await Promise.all([fetchAdminSubjects(params), getTechnologies()]);
 
   return (
     <div className="space-y-6">
       <div>
         <h1 className="text-2xl font-bold tracking-tight">Subject Management</h1>
-        <p className="text-muted-foreground">Add, edit, and delete subjects</p>
+        <p className="text-muted-foreground">Manage subjects within a technology</p>
       </div>
       <Suspense fallback={<SubjectTableSkeleton />}>
         <SubjectManagerClient
           subjects={result.data}
+          technologies={technologies}
           page={result.page}
           totalPages={result.totalPages}
           total={result.total}

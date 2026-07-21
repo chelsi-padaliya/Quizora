@@ -36,10 +36,11 @@ export async function fetchAdminQuestions(params: {
   });
 }
 
-export async function fetchAdminSubjects(params: { page?: string; search?: string }) {
+export async function fetchAdminSubjects(params: { page?: string; search?: string; technologyId?: string }) {
   return getSubjectsPaginated({
     page: parsePageParam(params.page),
     search: params.search,
+    technologyId: params.technologyId,
   });
 }
 
@@ -47,10 +48,12 @@ export async function fetchAdminTopics(params: {
   page?: string;
   search?: string;
   subjectId?: string;
+  technologyId?: string;
 }) {
   return getTopicsPaginated({
     page: parsePageParam(params.page),
     search: params.search,
     subjectId: params.subjectId,
+    technologyId: params.technologyId,
   });
 }
