@@ -73,7 +73,7 @@ function QuestionTableComponent({
                       {q.difficulty}
                     </Badge>
                   </div>
-                  <CardTitle className="break-words text-sm font-medium leading-snug sm:text-base sm:leading-snug">
+                  <CardTitle className="whitespace-pre-wrap break-words text-sm font-medium leading-snug sm:text-base sm:leading-snug">
                     {q.question}
                   </CardTitle>
                 </div>

@@ -77,7 +77,7 @@ export function ResultCard({ result, showReview = true }: ResultCardProps) {
                     )}
                     <div className="flex-1">
                       <p className="font-medium">
-                        {index + 1}. {q.question}
+                        <span className="whitespace-pre-wrap">{index + 1}. {q.question}</span>
                       </p>
                       <div className="mt-2 space-y-1 break-words text-sm">
                         <p>

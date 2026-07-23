@@ -38,7 +38,7 @@ export function TheoryCard({ questions }: TheoryCardProps) {
         <AccordionItem key={q.id} value={q.id} className="rounded-lg border px-4">
           <AccordionTrigger className="hover:no-underline">
             <div className="flex flex-1 flex-col items-start gap-2 text-left sm:flex-row sm:items-center">
-              <span className="font-medium">
+              <span className="whitespace-pre-wrap font-medium">
                 {index + 1}. {q.question}
               </span>
               <div className="flex gap-2">

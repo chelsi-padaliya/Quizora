@@ -185,7 +185,7 @@ export function QuizPlayer({ subjects, topics, initialQuestions, initialSubjectI
             <span>•</span>
             <span className="capitalize">{currentQuestion.difficulty}</span>
           </div>
-          <CardTitle className="text-lg leading-relaxed">{currentQuestion.question}</CardTitle>
+          <CardTitle className="whitespace-pre-wrap text-lg leading-relaxed">{currentQuestion.question}</CardTitle>
         </CardHeader>
         <CardContent>
           <RadioGroup

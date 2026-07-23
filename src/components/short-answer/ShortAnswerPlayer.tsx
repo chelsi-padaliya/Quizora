@@ -188,7 +188,7 @@ export function ShortAnswerPlayer({ subjects, topics, initialSubjectId }: ShortA
               return (
                 <div key={q.id} className="rounded-lg border p-3 text-sm">
                   <p className="font-medium">
-                    {i + 1}. {q.question}
+                    <span className="whitespace-pre-wrap">{i + 1}. {q.question}</span>
                   </p>
                   <div className="mt-2 flex items-start gap-2">
                     {ans?.state === "correct" ? (
@@ -254,7 +254,7 @@ export function ShortAnswerPlayer({ subjects, topics, initialSubjectId }: ShortA
               </>
             )}
           </div>
-          <CardTitle className="text-lg leading-relaxed">{currentQuestion.question}</CardTitle>
+          <CardTitle className="whitespace-pre-wrap text-lg leading-relaxed">{currentQuestion.question}</CardTitle>
         </CardHeader>
         <CardContent className="space-y-4">
           <div className="space-y-2">
