@@ -238,7 +238,7 @@ export function QuestionForm({
         <>
           <div className="space-y-2">
             <Label>Correct Answer</Label>
-            <Input {...register("answer")} placeholder="e.g. Read Data" />
+            <Textarea {...register("answer")} rows={3} placeholder="e.g. Read Data" />
             {errors.answer && (
               <p className="text-sm text-destructive">{errors.answer.message}</p>
             )}

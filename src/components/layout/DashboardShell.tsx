@@ -44,13 +44,13 @@ export function DashboardShell({ user, isAdmin = false, children }: DashboardShe
         onOpenChange={setMobileOpen}
         isAdmin={isAdmin}
       />
-      <div className="flex min-w-0 flex-1 overflow-hidden">
+      <div className="flex min-h-0 min-w-0 flex-1 overflow-hidden">
         <Sidebar
           collapsed={mounted ? collapsed : false}
           onToggleCollapse={toggleCollapsed}
           isAdmin={isAdmin}
         />
-        <main className="min-w-0 flex-1 overflow-y-auto p-3 sm:p-4 lg:p-6">{children}</main>
+        <main className="min-h-0 min-w-0 flex-1 overflow-y-auto p-3 sm:p-4 lg:p-6">{children}</main>
       </div>
     </div>
   );

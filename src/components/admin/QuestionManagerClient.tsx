@@ -154,13 +154,13 @@ export function QuestionManagerClient({
 
   return (
     <div className="space-y-6">
-      <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
-        <div className="flex min-w-0 flex-1 flex-col gap-2 sm:flex-row sm:flex-wrap">
+      <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
+        <div className="grid min-w-0 flex-1 gap-2 sm:grid-cols-2 lg:grid-cols-[minmax(200px,1fr)_minmax(160px,0.55fr)_minmax(160px,0.55fr)]">
           <SearchBar
             value={search}
             onChange={setSearch}
             placeholder="Search questions..."
-            className="w-full min-w-0 flex-1 sm:min-w-[200px]"
+            className="w-full min-w-0"
           />
           <FilterDropdown
             value={technologyFilter}

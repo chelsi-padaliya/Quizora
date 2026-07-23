@@ -54,7 +54,7 @@ export function Sidebar({ collapsed, onToggleCollapse, isAdmin }: SidebarProps) 
   return (
     <aside
       className={cn(
-        "hidden h-screen shrink-0 overflow-hidden border-r bg-card lg:flex lg:flex-col",
+        "hidden h-full min-h-0 shrink-0 overflow-hidden border-r bg-card lg:flex lg:flex-col",
         collapsed ? "w-16" : "w-64"
       )}
     >
