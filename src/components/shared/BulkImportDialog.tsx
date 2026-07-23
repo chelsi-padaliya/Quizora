@@ -51,12 +51,14 @@ export function BulkImportDialog({
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [summary, setSummary] = useState<BulkImportResult | null>(null);
+  const [selectedDetail, setSelectedDetail] = useState<keyof BulkImportResult["details"] | null>(null);
 
   const reset = useCallback(() => {
     setStep("upload");
     setJson("");
     setError(null);
     setSummary(null);
+    setSelectedDetail(null);
   }, []);
 
   const handleOpenChange = (next: boolean) => {
@@ -104,6 +106,7 @@ export function BulkImportDialog({
   };
 
   const title = questionType === "quiz" ? "Quiz" : questionType === "short_answer" ? "Short Answer" : "Theory";
+  const detailTitle = selectedDetail ? selectedDetail[0].toUpperCase() + selectedDetail.slice(1) : "";
 
   return (
     <>
@@ -151,20 +154,42 @@ export function BulkImportDialog({
               </div>
 
               <div className="grid grid-cols-2 gap-3 sm:grid-cols-3">
-                <div className="rounded-md border p-3 text-center"><p className="text-2xl font-bold">{summary.total}</p><p className="text-xs text-muted-foreground">Total Processed</p></div>
-                <div className="rounded-md border p-3 text-center"><p className="text-2xl font-bold text-green-600">{summary.imported}</p><p className="text-xs text-muted-foreground">Imported</p></div>
-                <div className="rounded-md border p-3 text-center"><p className="text-2xl font-bold text-blue-600">{summary.updated}</p><p className="text-xs text-muted-foreground">Updated</p></div>
-                <div className="rounded-md border p-3 text-center"><p className="text-2xl font-bold text-amber-600">{summary.duplicates}</p><p className="text-xs text-muted-foreground">Duplicates</p></div>
-                <div className="rounded-md border p-3 text-center"><p className="text-2xl font-bold text-muted-foreground">{summary.skipped}</p><p className="text-xs text-muted-foreground">Skipped</p></div>
-                <div className="rounded-md border p-3 text-center"><p className="text-2xl font-bold text-destructive">{summary.errors.length}</p><p className="text-xs text-muted-foreground">Errors</p></div>
+                {[
+                  ["total", summary.total, "", "Total Processed"],
+                  ["imported", summary.imported, "text-green-600", "Imported"],
+                  ["updated", summary.updated, "text-blue-600", "Updated"],
+                  ["duplicates", summary.duplicates, "text-amber-600", "Duplicates"],
+                  ["skipped", summary.skipped, "text-muted-foreground", "Skipped"],
+                  ["errors", summary.errors.length, "text-destructive", "Errors"],
+                ].map(([key, count, color, label]) => (
+                  <button
+                    key={key}
+                    type="button"
+                    onClick={() => setSelectedDetail(key as keyof BulkImportResult["details"])}
+                    className="rounded-md border p-3 text-center transition-colors hover:bg-accent focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+                  >
+                    <p className={`text-2xl font-bold ${color}`}>{count}</p>
+                    <p className="text-xs text-muted-foreground">{label}</p>
+                  </button>
+                ))}
               </div>
 
-              {summary.errors.length > 0 && (
+              {selectedDetail && (
                 <div className="max-h-[200px] overflow-y-auto rounded-md border p-3">
-                  <p className="mb-2 text-sm font-medium">Error Details</p>
-                  <ul className="space-y-1 text-sm text-destructive">
-                    {summary.errors.map((item) => <li key={item.row}>Row {item.row}: {item.message}</li>)}
-                  </ul>
+                  <p className="mb-2 text-sm font-medium">{detailTitle} Questions</p>
+                  {summary.details[selectedDetail].length > 0 ? (
+                    <ul className="space-y-2 text-sm">
+                      {summary.details[selectedDetail].map((item) => (
+                        <li key={`${item.row}-${item.question}`}>
+                          <span className="font-medium">Row {item.row}: {item.question || "Untitled question"}</span>
+                          <span className="text-muted-foreground"> · {item.subject || "No subject"}</span>
+                          {item.message && <p className="text-destructive">{item.message}</p>}
+                        </li>
+                      ))}
+                    </ul>
+                  ) : (
+                    <p className="text-sm text-muted-foreground">No questions in this group.</p>
+                  )}
                 </div>
               )}
 

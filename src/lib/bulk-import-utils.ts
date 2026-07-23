@@ -63,6 +63,21 @@ export interface BulkImportResult {
   skipped: number;
   duplicates: number;
   errors: { row: number; message: string }[];
+  details: {
+    total: BulkImportResultRow[];
+    imported: BulkImportResultRow[];
+    updated: BulkImportResultRow[];
+    duplicates: BulkImportResultRow[];
+    skipped: BulkImportResultRow[];
+    errors: BulkImportResultRow[];
+  };
+}
+
+export interface BulkImportResultRow {
+  row: number;
+  subject: string;
+  question: string;
+  message?: string;
 }
 
 const QUIZ_SAMPLE_ROW: BulkImportRawRow = {

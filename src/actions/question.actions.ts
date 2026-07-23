@@ -299,11 +299,14 @@ export async function bulkImportQuestionsFromRows(
       skipped: 0,
       duplicates: 0,
       errors: [],
+      details: { total: [], imported: [], updated: [], duplicates: [], skipped: [], errors: [] },
     };
 
     for (let i = 0; i < rows.length; i++) {
       const rowIndex = i + 1;
       const row = rows[i];
+      const detail = { row: rowIndex, subject: row.subject, question: row.question };
+      result.details.total.push(detail);
       const { input, error } = resolveRowToInput(
         row,
         rowIndex,
@@ -314,7 +317,10 @@ export async function bulkImportQuestionsFromRows(
 
       if (error || !input) {
         result.skipped++;
-        result.errors.push({ row: rowIndex, message: error ?? "Invalid row" });
+        const message = error ?? "Invalid row";
+        result.errors.push({ row: rowIndex, message });
+        result.details.skipped.push({ ...detail, message });
+        result.details.errors.push({ ...detail, message });
         continue;
       }
 
@@ -323,6 +329,7 @@ export async function bulkImportQuestionsFromRows(
 
       if (existingId && existingId !== "new") {
         result.duplicates++;
+        result.details.duplicates.push({ ...detail, message: "Duplicate question" });
         if (options.updateExisting) {
           if (!options.dryRun) {
             await prisma.question.update({
@@ -342,10 +349,12 @@ export async function bulkImportQuestionsFromRows(
             });
           }
           result.updated++;
+          result.details.updated.push(detail);
           continue;
         }
         if (options.skipDuplicates) {
           result.skipped++;
+          result.details.skipped.push({ ...detail, message: "Duplicate question" });
           continue;
         }
       }
@@ -370,6 +379,7 @@ export async function bulkImportQuestionsFromRows(
         duplicateMap.set(dupKey, "new");
       }
       result.imported++;
+      result.details.imported.push(detail);
     }
 
     if (!options.dryRun) {
