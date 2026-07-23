@@ -204,6 +204,9 @@ function resolveRowToInput(
   let topicId: string | undefined;
   if (row.topic?.trim()) {
     topicId = topicMap.get(`${subjectId}:${row.topic.trim().toLowerCase()}`);
+    if (!topicId) {
+      return { error: `Topic "${row.topic.trim()}" was not found for subject "${subjectName}"` };
+    }
   }
 
   const input: QuestionInput = {
