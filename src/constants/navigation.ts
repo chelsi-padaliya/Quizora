@@ -1,4 +1,4 @@
-import { BookOpen, Brain, FolderOpen, LayoutDashboard, ListChecks, PenLine, Tag } from "lucide-react";
+import { BookOpen, Brain, FolderOpen, LayoutDashboard, ListChecks, PenLine } from "lucide-react";
 import { ROUTES } from "@/constants";
 
 export const MAIN_NAV_ITEMS = [
@@ -10,8 +10,6 @@ export const MAIN_NAV_ITEMS = [
 
 export const ADMIN_NAV_ITEMS = [
   { href: ROUTES.technologies, label: "Manage Technologies", icon: FolderOpen },
-  { href: ROUTES.subjects, label: "Manage Subjects", icon: FolderOpen },
-  { href: ROUTES.topics, label: "Manage Topics", icon: Tag },
   { href: ROUTES.quizQuestions, label: "Manage Quiz Questions", icon: Brain },
   { href: ROUTES.theoryQuestions, label: "Manage Theory Questions", icon: ListChecks },
   { href: ROUTES.shortAnswerQuestions, label: "Manage Short Answer", icon: PenLine },

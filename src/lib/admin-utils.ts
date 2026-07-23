@@ -21,6 +21,8 @@ export async function fetchAdminQuestions(params: {
   page?: string;
   search?: string;
   subjectId?: string;
+  topicId?: string;
+  technologyId?: string;
   difficulty?: string;
   type?: QuestionType;
 }) {
@@ -32,6 +34,8 @@ export async function fetchAdminQuestions(params: {
     type: params.type,
     search: params.search,
     subjectId: params.subjectId,
+    topicId: params.topicId,
+    technologyId: params.technologyId,
     difficulty: params.difficulty as Difficulty | undefined,
   });
 }

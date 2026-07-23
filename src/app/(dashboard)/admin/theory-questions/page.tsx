@@ -21,6 +21,8 @@ interface AdminTheoryQuestionsPageProps {
     page?: string;
     search?: string;
     subjectId?: string;
+    topicId?: string;
+    technologyId?: string;
     difficulty?: string;
   }>;
 }

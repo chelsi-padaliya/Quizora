@@ -36,7 +36,6 @@ export function QuizPlayer({ subjects, topics, initialQuestions, initialSubjectI
   const [subjectId, setSubjectId] = useState(initialSubjectId ?? "all");
   const [technologyId, setTechnologyId] = useState("all");
   const [topicId, setTopicId] = useState("all");
-  const [difficulty, setDifficulty] = useState<string>("all");
   const [limit, setLimit] = useState<string>("10");
   const [questions, setQuestions] = useState<QuizQuestion[]>(initialQuestions ?? []);
   const [currentIndex, setCurrentIndex] = useState(0);
@@ -47,8 +46,6 @@ export function QuizPlayer({ subjects, topics, initialQuestions, initialSubjectI
 
   const currentQuestion = questions[currentIndex];
   const progress = questions.length > 0 ? ((currentIndex + 1) / questions.length) * 100 : 0;
-  const filteredTopics =
-    subjectId === "all" ? [] : topics.filter((topic) => topic.subjectId === subjectId);
 
   const handleSubmit = useCallback(async () => {
     setPhase("submitting");
@@ -85,7 +82,6 @@ export function QuizPlayer({ subjects, topics, initialQuestions, initialSubjectI
       const params = new URLSearchParams();
       if (subjectId !== "all") params.set("subjectId", subjectId);
       if (topicId !== "all") params.set("topicId", topicId);
-      if (difficulty !== "all") params.set("difficulty", difficulty);
       params.set("limit", limit);
 
       const res = await fetch(`/api/quiz/questions?${params.toString()}`);
@@ -125,11 +121,12 @@ export function QuizPlayer({ subjects, topics, initialQuestions, initialSubjectI
             onSubjectChange={(value) => { setSubjectId(value); setTopicId("all"); }}
             technologyId={technologyId}
             onTechnologyChange={(value) => { setTechnologyId(value); setSubjectId("all"); setTopicId("all"); }}
-            difficulty={difficulty}
-            onDifficultyChange={setDifficulty}
+            topicId={topicId}
+            onTopicChange={setTopicId}
             subjects={subjects}
+            topics={topics}
           />
-          <div className="grid gap-4 sm:grid-cols-2">
+          <div className="max-w-sm space-y-2">
             <div className="space-y-2">
               <Label>Question Limit</Label>
               <Select value={limit} onValueChange={setLimit}>
@@ -140,22 +137,6 @@ export function QuizPlayer({ subjects, topics, initialQuestions, initialSubjectI
                   {QUESTION_LIMITS.map((l) => (
                     <SelectItem key={String(l)} value={String(l)}>
                       {l === "all" ? "All" : l}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-            </div>
-            <div className="space-y-2">
-              <Label>Topic</Label>
-              <Select value={topicId} onValueChange={setTopicId} disabled={subjectId === "all"}>
-                <SelectTrigger>
-                  <SelectValue placeholder={subjectId === "all" ? "Select a subject first" : "All topics"} />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="all">All Topics</SelectItem>
-                  {filteredTopics.map((topic) => (
-                    <SelectItem key={topic.id} value={topic.id}>
-                      {topic.name}
                     </SelectItem>
                   ))}
                 </SelectContent>

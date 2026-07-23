@@ -195,6 +195,8 @@ export async function getTheoryQuestions(params: {
 
 export async function getQuestions(params: {
   subjectId?: string;
+  topicId?: string;
+  technologyId?: string;
   type?: QuestionType;
   difficulty?: Difficulty;
   search?: string;
@@ -207,6 +209,8 @@ export async function getQuestions(params: {
 
   const where: Prisma.QuestionWhereInput = {
     ...(params.subjectId && { subjectId: params.subjectId }),
+    ...(params.topicId && { topicId: params.topicId }),
+    ...(params.technologyId && { subject: { is: { technologyId: params.technologyId } } }),
     ...(params.type && { type: params.type }),
     ...(params.difficulty && { difficulty: params.difficulty }),
     ...(params.search && {

@@ -16,7 +16,7 @@ import { QuestionTable, QuestionTableSkeleton, type QuestionRow } from "@/compon
 import { PaginationControls } from "@/components/shared/PaginationControls";
 import { SearchBar } from "@/components/shared/SearchBar";
 import { FilterDropdown } from "@/components/shared/FilterDropdown";
-import { DIFFICULTIES, ITEMS_PER_PAGE } from "@/constants";
+import { ITEMS_PER_PAGE } from "@/constants";
 import { useDebounce } from "@/hooks/use-debounce";
 import {
   deleteQuestion,
@@ -46,7 +46,7 @@ const ShortAnswerForm = dynamic(
 
 interface QuestionManagerClientProps {
   questions: QuestionRow[];
-  subjects: { id: string; name: string }[];
+  subjects: { id: string; name: string; technology?: { id: string; name: string } }[];
   topics: { id: string; name: string; subjectId: string }[];
   page: number;
   totalPages: number;
@@ -84,7 +84,8 @@ export function QuestionManagerClient({
   const debouncedSearch = useDebounce(search, 300);
 
   const subjectFilter = searchParams.get("subjectId") ?? undefined;
-  const difficultyFilter = searchParams.get("difficulty") ?? undefined;
+  const technologyFilter = searchParams.get("technologyId") ?? undefined;
+  const topicFilter = searchParams.get("topicId") ?? undefined;
 
   const updateParams = useCallback(
     (updates: Record<string, string | undefined>) => {
@@ -138,14 +139,17 @@ export function QuestionManagerClient({
     [router]
   );
 
-  const subjectOptions = useMemo(
-    () => subjects.map((s) => ({ value: s.id, label: s.name })),
+  const technologyOptions = useMemo(
+    () => Array.from(new Map(subjects.filter((subject) => subject.technology).map((subject) => [subject.technology!.id, subject.technology!])).values()).map((technology) => ({ value: technology.id, label: technology.name })),
     [subjects]
   );
-
-  const difficultyOptions = useMemo(
-    () => DIFFICULTIES.map((d) => ({ value: d.value, label: d.label })),
-    []
+  const subjectOptions = useMemo(
+    () => subjects.filter((subject) => !technologyFilter || subject.technology?.id === technologyFilter).map((subject) => ({ value: subject.id, label: subject.name })),
+    [subjects, technologyFilter]
+  );
+  const topicOptions = useMemo(
+    () => topics.filter((topic) => !subjectFilter || topic.subjectId === subjectFilter).map((topic) => ({ value: topic.id, label: topic.name })),
+    [topics, subjectFilter]
   );
 
   return (
@@ -159,18 +163,25 @@ export function QuestionManagerClient({
             className="w-full min-w-0 flex-1 sm:min-w-[200px]"
           />
           <FilterDropdown
+            value={technologyFilter}
+            onChange={(v) => updateParams({ technologyId: v, subjectId: undefined, topicId: undefined, page: "1" })}
+            options={technologyOptions}
+            placeholder="Technology"
+            allLabel="All Technologies"
+          />
+          <FilterDropdown
             value={subjectFilter}
-            onChange={(v) => updateParams({ subjectId: v, page: "1" })}
+            onChange={(v) => updateParams({ subjectId: v, topicId: undefined, page: "1" })}
             options={subjectOptions}
             placeholder="Subject"
             allLabel="All Subjects"
           />
           <FilterDropdown
-            value={difficultyFilter}
-            onChange={(v) => updateParams({ difficulty: v, page: "1" })}
-            options={difficultyOptions}
-            placeholder="Difficulty"
-            allLabel="All Levels"
+            value={topicFilter}
+            onChange={(v) => updateParams({ topicId: v, page: "1" })}
+            options={topicOptions}
+            placeholder="Topic"
+            allLabel="All Topics"
           />
         </div>
         <div className="flex flex-col gap-2 sm:flex-row sm:flex-wrap">
@@ -189,7 +200,6 @@ export function QuestionManagerClient({
                 subjects={subjects}
                 topics={topics}
                 defaultSubjectId={subjectFilter}
-                defaultDifficulty={difficultyFilter}
                 onSuccess={() => {
                   setCreateOpen(false);
                   startTransition(() => router.refresh());
