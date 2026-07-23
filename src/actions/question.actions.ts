@@ -232,6 +232,15 @@ function resolveRowToInput(
   return { input: parsed.data };
 }
 
+function getDuplicateKey(
+  subjectId: string | null | undefined,
+  topicId: string | null | undefined,
+  question: string | null | undefined,
+  answer: string | null | undefined
+) {
+  return `${subjectId ?? ""}:${topicId ?? ""}:${(question ?? "").trim().toLowerCase()}:${(answer ?? "").trim().toLowerCase()}`;
+}
+
 export async function previewBulkImport(
   rows: BulkImportRawRow[],
   type: "quiz" | "theory" | "short_answer"
@@ -242,11 +251,11 @@ export async function previewBulkImport(
     const { subjectMap, topicMap } = await buildImportLookups();
     const existingQuestions = await prisma.question.findMany({
       where: { type },
-      select: { id: true, subjectId: true, question: true },
+      select: { id: true, subjectId: true, topicId: true, question: true, answer: true, correctAnswer: true },
     });
 
     const duplicateSet = new Set(
-      existingQuestions.map((q) => `${q.subjectId}:${(q.question || "").trim().toLowerCase()}`)
+      existingQuestions.map((q) => getDuplicateKey(q.subjectId, q.topicId, q.question, q.answer ?? q.correctAnswer))
     );
 
     let duplicateCount = 0;
@@ -255,7 +264,7 @@ export async function previewBulkImport(
       let isDuplicate = false;
 
       if (input) {
-        const key = `${input.subjectId}:${(input.question || "").trim().toLowerCase()}`;
+        const key = getDuplicateKey(input.subjectId, input.topicId, input.question, input.answer ?? input.correctAnswer);
         isDuplicate = duplicateSet.has(key);
         if (isDuplicate) duplicateCount++;
       }
@@ -284,12 +293,12 @@ export async function bulkImportQuestionsFromRows(
     const { subjectMap, topicMap } = await buildImportLookups();
     const existingQuestions = await prisma.question.findMany({
       where: { type: options.type },
-      select: { id: true, subjectId: true, question: true },
+      select: { id: true, subjectId: true, topicId: true, question: true, answer: true, correctAnswer: true },
     });
 
     const duplicateMap = new Map<string, string>();
     existingQuestions.forEach((q) => {
-      duplicateMap.set(`${q.subjectId}:${(q.question || "").trim().toLowerCase()}`, q.id);
+      duplicateMap.set(getDuplicateKey(q.subjectId, q.topicId, q.question, q.answer ?? q.correctAnswer), q.id);
     });
 
     const result: BulkImportResult = {
@@ -324,12 +333,12 @@ export async function bulkImportQuestionsFromRows(
         continue;
       }
 
-      const dupKey = `${input.subjectId}:${(input.question || "").trim().toLowerCase()}`;
+      const dupKey = getDuplicateKey(input.subjectId, input.topicId, input.question, input.answer ?? input.correctAnswer);
       const existingId = duplicateMap.get(dupKey);
 
       if (existingId && existingId !== "new") {
         result.duplicates++;
-        result.details.duplicates.push({ ...detail, message: "Duplicate question" });
+        result.details.duplicates.push({ ...detail, message: "Duplicate subject, topic, question, and answer" });
         if (options.updateExisting) {
           if (!options.dryRun) {
             await prisma.question.update({
@@ -354,7 +363,7 @@ export async function bulkImportQuestionsFromRows(
         }
         if (options.skipDuplicates) {
           result.skipped++;
-          result.details.skipped.push({ ...detail, message: "Duplicate question" });
+          result.details.skipped.push({ ...detail, message: "Duplicate subject, topic, question, and answer" });
           continue;
         }
       }
